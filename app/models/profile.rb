@@ -96,8 +96,16 @@ class Profile < ActiveRecord::Base
     ScopeTool.union *scopes
   end
 
-  def members_by_name
-    members.order('profiles.name')
+  def members_by_name(name = nil)
+    if name and !name.blank?
+      members_like('name',name).order('profiles.name')
+    else
+      members.order('profiles.name')
+    end
+  end
+
+  def members_like(field,value)
+    members.where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value
   end
 
   class << self

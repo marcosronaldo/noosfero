@@ -2,8 +2,17 @@ class ProfileMembersController < MyProfileController
   protect 'manage_memberships', :profile
 
   def index
-    @members = profile.members_by_name
+    @filters = params[:filters] || {:roles => []}
+    @filters[:roles] = [] unless @filters[:roles]
+    @data = {}
+
+    #binding.pry
+    @data[:members] = profile.members_by_name(@filters[:name]).by_role(@filters[:roles])
     @member_role = environment.roles.find_by_name('member')
+
+    #Roles list for filter
+    @data[:roles] = Profile::Roles.organization_member_roles(environment.id)
+
   end
 
   def update_roles
@@ -153,6 +162,13 @@ class ProfileMembersController < MyProfileController
         redirect_to :controller => 'profile_editor'
       end
     end
+  end
+
+  def search_members
+    result = profile.members_like 'name', params[:filter_name]
+
+    puts result.inspect
+    render :json => result.map { |member| {:value => member.name}}
   end
 
 end

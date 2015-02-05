@@ -22,9 +22,12 @@ class Person < Profile
   }
 
   scope :by_role, lambda { |roles|
+
     roles = [roles] unless roles.kind_of?(Array)
-    { :select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.role_id IN (?)',
-roles] }
+
+    if roles.length > 0
+      {:select => 'DISTINCT profiles.*', :joins => :role_assignments, :conditions => ['role_assignments.role_id IN (?)', roles] }
+    end
   }
 
   def has_permission_with_plugins?(permission, profile)
