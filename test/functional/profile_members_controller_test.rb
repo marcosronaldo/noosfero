@@ -1,8 +1,6 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require 'profile_members_controller'
 
-require 'pry'
-
 # Re-raise errors caught by the controller.
 class ProfileMembersController; def rescue_action(e) raise e end; end
 
