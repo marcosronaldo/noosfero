@@ -1436,7 +1436,12 @@ class ProfileControllerTest < ActionController::TestCase
     login_as('profile_moderator_user')
     @controller.stubs(:locale).returns('pt')
     assert_difference 'Delayed::Job.count', 1 do
+
+      @request.session[:members_filters] = {:name => 'SomeUser'}
       post :send_mail, :profile => community.identifier, :mailing => {:subject => 'Hello', :body => 'We have some news'}
+
+      mailing = OrganizationMailing.last
+      assert_equal 'SomeUser', mailing.data[:name]
     end
   end
 

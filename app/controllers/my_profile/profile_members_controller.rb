@@ -6,7 +6,8 @@ class ProfileMembersController < MyProfileController
     @filters[:roles] = [] unless @filters[:roles]
     @data = {}
 
-    #binding.pry
+    session[:members_filters] = params[:filters].to_hash if request.post?
+
     @data[:members] = profile.members_by_name(@filters[:name]).by_role(@filters[:roles])
     @member_role = environment.roles.find_by_name('member')
 

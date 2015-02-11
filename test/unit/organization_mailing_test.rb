@@ -98,6 +98,11 @@ class OrganizationMailingTest < ActiveSupport::TestCase
     assert_equal [Person['user_one'], Person['user_two']], mailing.recipients
   end
 
+  should 'return recipients filtered by data member name' do
+    mailing = create(OrganizationMailing, :source => community, :subject => 'Hello', :body => 'We have some news', :person => person, :data => {:name => 'user_one'})
+    assert_equal [Person['user_one']], mailing.recipients
+  end
+
   should 'return recipients according to limit' do
     mailing = create(OrganizationMailing, :source => community, :subject => 'Hello', :body => 'We have some news', :person => person)
     assert_equal [Person['user_one']], mailing.recipients(0, 1)

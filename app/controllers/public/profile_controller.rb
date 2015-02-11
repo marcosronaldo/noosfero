@@ -362,6 +362,8 @@ class ProfileController < PublicController
     if request.post?
       @mailing.locale = locale
       @mailing.person = user
+      @mailing.data = session[:members_filters] || {}
+
       if @mailing.save
         session[:notice] = _('The e-mails are being sent')
         redirect_to_previous_location
