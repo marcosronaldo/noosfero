@@ -2,7 +2,7 @@
 
     <%= field_set_tag _('Filter'), :class => 'filter_fields' do %>
         <p>
-          <%= labelled_text_field(_("Name")+': ', "filters[name]", @filters[:name], {:id => 'filter-name-autocomplete'}) %>
+          <%= labelled_text_field(_('Name or Email')+': ', "filters[name]", @filters[:name], {:id => 'filter-name-autocomplete',:size => 30}) %>
         </p>
 
         <p><%= _('Roles:') %> </p>

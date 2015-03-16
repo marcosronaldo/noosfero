@@ -5,10 +5,12 @@ class ProfileMembersController < MyProfileController
     @filters = params[:filters] || {:roles => []}
     @filters[:roles] = [] unless @filters[:roles]
     @data = {}
+    field = 'name'
+    field = 'email' if @filters[:name] =~ /\@/
 
     session[:members_filters] = params[:filters].to_hash if request.post?
 
-    @data[:members] = profile.members_by_name(@filters[:name]).by_role(@filters[:roles])
+    @data[:members] = profile.members_by(field,@filters[:name]).by_role(@filters[:roles])
     @member_role = environment.roles.find_by_name('member')
 
     #Roles list for filter
@@ -166,10 +168,12 @@ class ProfileMembersController < MyProfileController
   end
 
   def search_members
-    result = profile.members_like 'name', params[:filter_name]
+    field = 'name'
+    field = 'email' if params[:filter_name] =~ /\@/
 
-    puts result.inspect
-    render :json => result.map { |member| {:value => member.name}}
+    result = profile.members_like field, params[:filter_name]
+
+    render :json => result.map { |member| {:label => "#{member.name} <#{member.email}>", :value => member.email }}
   end
 
 end

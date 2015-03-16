@@ -42,7 +42,7 @@ class ProfileMembersControllerTest < ActionController::TestCase
      :member => Profile::Roles.member(Environment.default)
     }
 
-    member = create_user('test_member').person
+    member = create_user('test_member', :email => 'testmember@test.com.br').person
     member.add_role(roles[:member], ent)
 
     admin = create_user('test_admin').person
@@ -51,7 +51,7 @@ class ProfileMembersControllerTest < ActionController::TestCase
     user = create_user_with_permission('test_user', 'manage_memberships', ent)
     login_as :test_user
 
-    post :index, :profile => 'test_enterprise' , :filters => {:name => 'test', :roles => [roles[:member].id]}
+    post :index, :profile => 'test_enterprise' , :filters => {:name => 'testmember@test.com.br', :roles => [roles[:member].id]}
 
     assert_response :success
     assert_template 'index'

@@ -88,23 +88,23 @@ class Profile < ActiveRecord::Base
   scope :templates, {:conditions => {:is_template => true}}
   scope :no_templates, {:conditions => {:is_template => false}}
 
-  def members
+  def members(by_field = '')
     scopes = plugins.dispatch_scopes(:organization_members, self)
-    scopes << Person.members_of(self)
+    scopes << Person.members_of(self,by_field)
     return scopes.first if scopes.size == 1
     ScopeTool.union *scopes
   end
 
-  def members_by_name(name = nil)
-    if name and !name.blank?
-      members_like('name',name).order('profiles.name')
+  def members_by(field,value = nil)
+    if value and !value.blank?
+      members_like(field,value).order('profiles.name')
     else
       members.order('profiles.name')
     end
   end
 
   def members_like(field,value)
-    members.where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value
+    members(field).where("LOWER(#{field}) LIKE ?", "%#{value.downcase}%") if value
   end
 
   class << self
