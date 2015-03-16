@@ -19,7 +19,7 @@ class Event < Article
     maybe_add_http(self.setting[:link])
   end
 
-  xss_terminate :only => [ :body, :link, :address ], :with => 'white_list', :on => 'validation'
+  xss_terminate :only => [ :name, :body, :link, :address ], :with => 'white_list', :on => 'validation'
 
   def initialize(*args)
     super(*args)
@@ -141,11 +141,13 @@ class Event < Article
     result
   end
 
+  def duration
+    ((self.end_date || self.start_date) - self.start_date).to_i
+  end
+
+  alias_method :article_lead, :lead
   def lead
-    content_tag('div',
-      show_period(start_date, end_date),
-      :class => 'event-dates'
-    ) + super
+    self.class.action_view.render 'content_viewer/event_lead', event: self
   end
 
   def event?
