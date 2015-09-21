@@ -8,6 +8,14 @@ class FeaturesControllerTest < ActionController::TestCase
     @controller = FeaturesController.new
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
+
+    @person_custom_field = CustomField.new :name => 'my person custom field', :format => 'string',:customized_type => 'Person'
+    @person_custom_field.save
+    @community_custom_field = CustomField.new :name => 'my community custom field', :format => 'string', :customized_type => 'Community'
+    @community_custom_field.save
+    @enterprise_custom_field = CustomField.new :name => 'my enterprise custom field', :format => 'string', :customized_type => 'Enterprise'
+    @enterprise_custom_field.save
+
     login_as(create_admin_user(Environment.find(2)))
   end
 
@@ -85,6 +93,36 @@ class FeaturesControllerTest < ActionController::TestCase
     end
   end
 
+  should 'list possible custom fields' do
+    uses_host 'anhetegua.net'
+    get :manage_fields
+    assert_template 'manage_fields'
+
+    assert_equal 1, Person.custom_fields.size
+    Person.custom_fields.each do |field|
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_description[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
+    end
+
+    assert_equal 1, Community.custom_fields.size
+    Community.custom_fields.each do |field|
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_description[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
+    end
+
+    assert_equal 1, Enterprise.custom_fields.size
+    Enterprise.custom_fields.each do |field|
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_description[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
+      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
+    end
+  end
+
   should 'update custom_person_fields' do
     uses_host 'anhetegua.net'
     e = Environment.find(2)
@@ -159,4 +197,34 @@ class FeaturesControllerTest < ActionController::TestCase
     assert_includes json_response, {"id"=>person.id, "name"=>person.name}
   end
 
+  should 'create custom field' do
+    uses_host 'anhetegua.net'
+    post :create_custom_field, :custom_field => {:name => 'foo', :description => 'bar', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true}
+    assert_redirected_to :action => 'manage_fields'
+    assert_equal _('Custom Field updated successfully.'), session[:notice]
+  end
+
+  should 'update custom field' do
+    uses_host 'anhetegua.net'
+
+    field = CustomField.new :name => 'foo', :description => 'bar', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
+    field.save
+    field.reload
+
+    post :update_custom_field, {:id => field.id, :custom_field => {:name => 'Foo', :description => 'Bar', :default_value => 'foobar', :active => true, :required => true, :signup => true}}
+    assert_redirected_to :action => 'manage_fields'
+    assert_equal _('Custom Field updated successfully.'), session[:notice]
+  end
+
+  should 'destroy custom field' do
+    uses_host 'anhetegua.net'
+
+    field = CustomField.new :name => 'foo', :description => 'bar', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
+    field.save
+    field.reload
+
+    post :destroy_custom_field, :id => field.id
+    assert_redirected_to :action => 'manage_fields'
+    assert_equal _('Custom Field deleted successfully.'), session[:notice]
+  end
 end

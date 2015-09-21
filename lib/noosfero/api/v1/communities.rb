@@ -26,8 +26,15 @@ module Noosfero
 
           # Example Request:
           #  POST api/v1/communties?private_token=234298743290432&community[name]=some_name
+          #  for each custom field for community, add &community[field_name]=field_value to the request
           post do
             params[:community] ||= {}
+
+            params[:community][:custom_values]={}
+            params[:community].keys.each do |key|
+              params[:community][:custom_values][key]=params[:community].delete(key) if Community.custom_fields.any?{|cf| cf.name==key}
+            end
+
             begin
               community = Community.create_after_moderation(current_person, params[:community].merge({:environment => environment}))
             rescue
