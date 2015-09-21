@@ -34,6 +34,13 @@ module Noosfero
         expose :identifier, :name, :id
         expose :created_at, :format_with => :timestamp
         expose :updated_at, :format_with => :timestamp
+        expose :additional_data do |profile, options|
+          hash ={}
+          profile.public_values.each do |value|
+            hash[value.custom_field.name]=value.value
+          end
+          hash
+        end
         expose :image, :using => Image
       end
 

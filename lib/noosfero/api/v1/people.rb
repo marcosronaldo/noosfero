@@ -50,6 +50,7 @@ module Noosfero
 
           # Example Request:
           #  POST api/v1/people?person[login]=some_login&person[password]=some_password&person[name]=Jack
+          #  for each custom field for person, add &person[field_name]=field_value to the request
           desc "Create person"
           post do
             user_data = {}
@@ -57,7 +58,14 @@ module Noosfero
             user_data[:email] = params[:person].delete(:email)
             user_data[:password] = params[:person].delete(:password)
             user_data[:password_confirmation] = params[:person].delete(:password_confirmation)
+
+            params[:person][:custom_values]={}
+            params[:person].keys.each do |key|
+              params[:person][:custom_values][key]=params[:person].delete(key) if Person.custom_fields.any?{|cf| cf.name==key}
+            end
+
             user = User.build(user_data, params[:person], environment)
+
             begin
               user.signup!
             rescue ActiveRecord::RecordInvalid

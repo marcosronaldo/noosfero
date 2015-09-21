@@ -285,6 +285,13 @@ Given /^the following price details?$/ do |table|
   end
 end
 
+Given /^the following custom fields?$/ do |table|
+  table.hashes.each do |item|
+    field = CustomField.new :name => item[:name], :description => item[:description], :format => item[:format], :customized_type => item[:customized_type]
+    field.save!
+  end
+end
+
 Given /^I am logged in as "(.+)"$/ do |username|
   Given %{I go to logout page}
   And %{I go to login page}
