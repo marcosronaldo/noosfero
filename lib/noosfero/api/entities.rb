@@ -30,66 +30,81 @@ module Noosfero
         end
       end
 
-      class Profile < Entity
-        expose :identifier, :name, :id
-        expose :created_at, :format_with => :timestamp
-        expose :updated_at, :format_with => :timestamp
-        expose :image, :using => Image
-      end
-
-      class User < Entity
-        expose :id
-        expose :login
-      end
-
-      class Person < Profile
-        root 'people', 'person'
-        expose :user, :using => User
-      end
-      class Enterprise < Profile
-        root 'enterprises', 'enterprise'
-      end
-      class Community < Profile
-        root 'communities', 'community'
-        expose :description
-        expose :categories
-        expose :members, :using => Person
-      end
-
       class CategoryBase < Entity
         root 'categories', 'category'
-        expose :name, :id
+        expose :name, :id, :slug
       end
 
       class Category < CategoryBase
         root 'categories', 'category'
-        expose :slug
         expose :full_name do |category, options|
           category.full_name
         end
         expose :parent, :using => CategoryBase, if: { parent: true }
         expose :children, :using => CategoryBase, if: { children: true }
         expose :image, :using => Image
+        expose :display_color
+      end
+
+      class Region < Category
+        root 'regions', 'region'
+        expose :parent_id
+      end
+
+      class Profile < Entity
+        expose :identifier, :name, :id
+        expose :created_at, :format_with => :timestamp
+        expose :updated_at, :format_with => :timestamp
+        expose :image, :using => Image
+        expose :region, :using => Region
+      end
+
+      class UserBasic < Entity
+        expose :id
+        expose :login
+      end
+
+      class Person < Profile
+        root 'people', 'person'
+        expose :user, :using => UserBasic, documentation: {type: 'User', desc: 'The user data of a person' }
+      end
+
+      class Enterprise < Profile
+        root 'enterprises', 'enterprise'
+      end
+
+      class Community < Profile
+        root 'communities', 'community'
+        expose :description
+        expose :admins do |community, options|
+          community.admins.map{|admin| {"name"=>admin.name, "id"=>admin.id}}
+        end
+        expose :categories, :using => Category
+        expose :members, :using => Person
       end
 
       class ArticleBase < Entity
         root 'articles', 'article'
         expose :id
         expose :body
-        expose :abstract
+        expose :abstract, documentation: {type: 'String', desc: 'Teaser of the body'}
         expose :created_at, :format_with => :timestamp
         expose :updated_at, :format_with => :timestamp
         expose :title, :documentation => {:type => "String", :desc => "Title of the article"}
-        expose :created_by, :as => :author, :using => Profile
-        expose :profile, :using => Profile
+        expose :created_by, :as => :author, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile author that create the article'}
+        expose :profile, :using => Profile, :documentation => {type: 'Profile', desc: 'The profile associated with the article'}
         expose :categories, :using => Category
         expose :image, :using => Image
-        #TODO Apply vote stuff in core and make this test
         expose :votes_for
         expose :votes_against
         expose :setting
         expose :position
         expose :hits
+        expose :start_date
+        expose :end_date, :documentation => {type: 'DateTime', desc: 'The date of finish of the article'}
+        expose :tag_list
+        expose :children_count
+        expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
         expose :path
       end
 
@@ -106,8 +121,26 @@ module Noosfero
         expose :author, :using => Profile
       end
 
+      class User < Entity
+        root 'users', 'user'
+        expose :id
+        expose :login
+        expose :email
+        expose :person, :using => Person
+        expose :activated?, as: :activated
+        expose :permissions do |user, options|
+          output = {}
+          user.person.role_assignments.map do |role_assigment|
+            if role_assigment.resource.respond_to?(:identifier) && !role_assigment.role.nil?
+              output[role_assigment.resource.identifier] = role_assigment.role.permissions
+            end
+          end
+          output
+        end
+      end
+
       class UserLogin < User
-        expose :private_token
+        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}
       end
 
       class Task < Entity
@@ -115,6 +148,16 @@ module Noosfero
         expose :id
         expose :type
       end
+
+      class Environment < Entity
+        expose :name
+      end
+
+      class Tag < Entity
+        root 'tags', 'tag'
+        expose :name
+      end
+
 
     end
   end
