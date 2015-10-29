@@ -24,7 +24,9 @@ module Noosfero
 
               paginate_options = params.select{|k,v| [:page, :per_page].include?(k.to_sym)}
               paginate_options.each_pair{|k,v| v=v.to_i}
-              search_result = find_by_contents(asset, context, scope, query, paginate_options.blank? ? nil : paginate_options.symbolize_keys, options)
+              paginate_options[:page]=1 if !paginate_options.keys.include?(:page)
+
+              search_result = find_by_contents(asset, context, scope, query, paginate_options.symbolize_keys, options)
 
               articles = search_result[:results]
 

@@ -1,4 +1,5 @@
 require 'grape'
+require_relative '../../find_by_contents'
 
   module Noosfero;
     module API
@@ -22,7 +23,7 @@ require 'grape'
       def current_user
         private_token = (params[PRIVATE_TOKEN_PARAM] || headers['Private-Token']).to_s
         @current_user ||= User.find_by_private_token(private_token)
-        #@current_user = nil if !@current_user.nil? && @current_user.private_token_expired?
+        @current_user = nil if !@current_user.nil? && @current_user.private_token_expired?
         @current_user
       end
 
@@ -38,18 +39,11 @@ require 'grape'
         @environment
       end
 
+      include FindByContents
+
       ####################################################################
       #### SEARCH
       ####################################################################
-      def find_by_contents(asset, context, scope, query, paginate_options={:page => 1}, options={})
-        paginate_options||={}
-        paginate_options[:page]=1 if !paginate_options.keys.include?(:page)
-        scope = scope.with_templates(options[:template_id]) unless options[:template_id].blank?
-        search = plugins.dispatch_first(:find_by_contents, asset, scope, query, paginate_options, options)
-        register_search_term(query, scope.count, search[:results].count, context, asset)
-        search
-      end
-
       def multiple_search?(searches=nil)
         ['index', 'category_index'].include?(params[:action]) || (searches && searches.size > 1)
       end
