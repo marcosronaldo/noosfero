@@ -18,11 +18,8 @@ class FeaturesController < AdminController
 
   def manage_fields
     @person_fields = Person.fields
-    @person_custom_fields = Person.custom_fields
     @enterprise_fields = Enterprise.fields
-    @enterprise_custom_fields = Enterprise.custom_fields
     @community_fields = Community.fields
-    @community_custom_fields = Community.custom_fields
   end
 
   def manage_person_fields
