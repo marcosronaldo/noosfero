@@ -24,10 +24,6 @@ module CustomFieldsHelper
     forms
   end
 
-  def render_view_for_custom_field(field)
-    "custom_fields/#{field.format}"
-  end
-
   def render_extras_field(id, extra=nil, field=nil)
     if extra.nil?
       CGI::escapeHTML((render(:partial => 'features/custom_fields/extras_field', :locals => {:id => id, :extra => nil, :field => field})))
