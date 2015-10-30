@@ -34,10 +34,6 @@ module CustomFieldsHelper
     forms
   end
 
-  def render_field_form(format)
-    "custom_fields/formats/#{format}"
-  end
-
   def render_view_for_custom_field(field)
     "custom_fields/#{field.format}"
   end
