@@ -1,21 +1,21 @@
 <h1><%= _("Custom Fields") %></h1><hr>
 
-<% form_id = "#{customized_type.downcase}-custom-fields-form" %>
-<% fields_id = "#{customized_type.downcase}-custom-fields" %>
-<% format_values_id = "#{customized_type.downcase}-formats" %>
+<% form_id = "#{customized_type.to_s.downcase}-custom-fields-form" %>
+<% fields_id = "#{customized_type.to_s.downcase}-custom-fields" %>
+<% format_values_id = "#{customized_type.to_s.downcase}-formats" %>
 
 <%= form_tag({:action => 'manage_custom_fields'}, :id => "#{form_id}")  do %>
-<%= hidden_field '', 'customized_type', :value => customized_type %>
+<%= hidden_field '', 'customized_type', :value => customized_type.to_s %>
 <div id="<%= fields_id %>">
-  <% custom_fields.each do |field|%>
-    <%= form_for_field(field, customized_type) %>
+  <% customized_type.custom_fields.each do |field|%>
+    <%= form_for_field(field, customized_type.to_s) %>
   <% end %>
 </div>
 
 <div class="addition-buttons">
   <fieldset>
     <legend><%= _('New field') %></legend>
-      <%= select_tag _('Type: '), options_for_select(custom_field_forms(customized_type)), {:id => "#{format_values_id}"} %>
+      <%= select_tag _('Type: '), options_for_select(custom_field_forms(customized_type.to_s)), {:id => "#{format_values_id}"} %>
       <%= button(:add, _('Add'), 'javascript: void()', :onClick => "add_content('##{fields_id}',$('##{format_values_id} option:selected').val(), 'NEW_FIELD_ID');") %>
   </fieldset>
 </div>
