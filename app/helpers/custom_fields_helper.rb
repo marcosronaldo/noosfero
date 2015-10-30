@@ -1,15 +1,5 @@
 module CustomFieldsHelper
 
-  CUSTOM_FIELD_FORM_CLASS = {
-    'string' => 'formfield type-text',
-    'text' => 'formfield type-textarea',
-    'date' => 'formfield type-text',
-    'numeric' => 'formfield type-text',
-    'link' => 'formfield type-text',
-    'list' => 'formfield type-select',
-    'checkbox' => 'formfield type-text'
-  }
-
   def format_name(format)
     names = {}
     names['string'] = _('String')
@@ -36,10 +26,6 @@ module CustomFieldsHelper
 
   def render_view_for_custom_field(field)
     "custom_fields/#{field.format}"
-  end
-
-  def class_for_field(field)
-    CUSTOM_FIELD_FORM_CLASS[field.format]
   end
 
   def render_extras_field(id, extra=nil, field=nil)
