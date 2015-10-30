@@ -11,6 +11,7 @@
   <% end %>
 
   <%= render :partial => partial_for_class(@profile.class), :locals => { :f => f } %>
+
   <div id="profile_change_picture_title">
     <h2><%= _('Change picture') %></h2>
     <span><%= unchangeable_privacy_field @profile %></span>
