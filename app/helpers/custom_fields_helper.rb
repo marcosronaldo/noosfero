@@ -36,11 +36,23 @@ module CustomFieldsHelper
     render :partial => 'features/custom_fields/form', :locals => {:field => field}
   end
 
+  def display_custom_field_value(custom_field_value)
+    value = profile.custom_value(custom_field_value.custom_field.name)
+    case custom_field_value.custom_field.format
+    when 'text', 'list', 'numeric', 'date', 'string'
+      value
+    when 'checkbox'
+      value == "1" ? _('Yes') : _('No')
+    when 'link'
+      url = value[/\Ahttps?:\/\//i] ? value : "http://#{value}"
+      link_to(value, url, :target => '_blank')
+    end
+  end
+
   private
 
   def form_for_format(customized_type, format)
     field = CustomField.new(:format => format, :customized_type => customized_type)
-
     CGI::escapeHTML((render(:partial => 'features/custom_fields/form', :locals => {:field => field})))
   end
 end
