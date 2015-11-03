@@ -7,7 +7,6 @@ class CustomFieldValue < ActiveRecord::Base
   def can_save?
     if value.blank? && custom_field.required
       errors.add(custom_field.name, _("can't be blank"))
-      errors.add(custom_field.name, _("can't be blank"))
       return false
     end
     return true
