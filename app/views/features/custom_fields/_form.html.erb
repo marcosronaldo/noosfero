@@ -3,11 +3,11 @@
 <div id="<%= id %>" class="custom-field-item">
 <fieldset class="fieldbox">
   <legend><%= format_name(field.format) %></legend>
-    <%= required labelled_form_field _('Name'), text_field_tag("custom_fields[#{id}][name]", field.name) %>
+  <%= required labelled_form_field _('Name'), text_field_tag("custom_fields[#{id}][name]", field.name, :size => 30) %>
     <%= button_to_function :delete, _('Remove field'), "remove_content('##{id}');" %>
 
     <% if field.format != "list" %>
-    <%= labelled_form_field  _('Default value'), text_field_tag("custom_fields[#{id}][default_value]", field.default_value) %>
+      <%= labelled_form_field  _('Default value'), text_field_tag("custom_fields[#{id}][default_value]", field.default_value, :size => 30) %>
     <% end %>
     <%= hidden_field_tag "custom_fields[#{id}][customized_type]", field.customized_type.to_s %>
     <%= hidden_field_tag "custom_fields[#{id}][format]", field.format %>
