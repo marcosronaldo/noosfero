@@ -2,7 +2,6 @@ class CreateCustomFields < ActiveRecord::Migration
   def change
     create_table :custom_fields do |t|
       t.string :name
-      t.string :description, :default => ""
       t.string :format, :default => ""
       t.text :default_value, :default => ""
       t.string :customized_type
