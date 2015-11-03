@@ -104,7 +104,6 @@ class FeaturesControllerTest < ActionController::TestCase
     assert_equal 1, Person.custom_fields.size
     Person.custom_fields.each do |field|
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_description[#{field.name}]"})
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
     end
@@ -112,7 +111,6 @@ class FeaturesControllerTest < ActionController::TestCase
     assert_equal 1, Community.custom_fields.size
     Community.custom_fields.each do |field|
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_description[#{field.name}]"})
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
     end
@@ -120,7 +118,6 @@ class FeaturesControllerTest < ActionController::TestCase
     assert_equal 1, Enterprise.custom_fields.size
     Enterprise.custom_fields.each do |field|
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_description[#{field.name}]"})
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
       assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
     end
@@ -202,7 +199,7 @@ class FeaturesControllerTest < ActionController::TestCase
 
   should 'create custom field' do
     uses_host 'anhetegua.net'
-    post :create_custom_field, :custom_field => {:name => 'foo', :description => 'bar', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true}
+    post :create_custom_field, :custom_field => {:name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true}
     assert_redirected_to :action => 'manage_fields'
     assert_equal _('Custom Field updated successfully.'), session[:notice]
   end
@@ -210,11 +207,11 @@ class FeaturesControllerTest < ActionController::TestCase
   should 'update custom field' do
     uses_host 'anhetegua.net'
 
-    field = CustomField.new :name => 'foo', :description => 'bar', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
+    field = CustomField.new :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
     field.save
     field.reload
 
-    post :update_custom_field, {:id => field.id, :custom_field => {:name => 'Foo', :description => 'Bar', :default_value => 'foobar', :active => true, :required => true, :signup => true}}
+    post :update_custom_field, {:id => field.id, :custom_field => {:name => 'Foo', :default_value => 'foobar', :active => true, :required => true, :signup => true}}
     assert_redirected_to :action => 'manage_fields'
     assert_equal _('Custom Field updated successfully.'), session[:notice]
   end
@@ -222,7 +219,7 @@ class FeaturesControllerTest < ActionController::TestCase
   should 'destroy custom field' do
     uses_host 'anhetegua.net'
 
-    field = CustomField.new :name => 'foo', :description => 'bar', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
+    field = CustomField.new :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
     field.save
     field.reload
 

@@ -1,5 +1,5 @@
 class CustomField < ActiveRecord::Base
-  attr_accessible :name, :description, :default_value, :format, :extras, :customized_type, :active, :required, :signup
+  attr_accessible :name, :default_value, :format, :extras, :customized_type, :active, :required, :signup
   serialize :customized_type
   serialize :extras
   has_many :custom_field_values, :dependent => :delete_all

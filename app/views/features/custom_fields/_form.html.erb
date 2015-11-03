@@ -6,8 +6,6 @@
     <%= required labelled_form_field _('Name'), text_field_tag("custom_fields[#{id}][name]", field.name) %>
     <%= button_to_function :delete, _('Remove field'), "remove_content('##{id}');" %>
 
-    <%= labelled_form_field _('Description'), text_field_tag("custom_fields[#{id}][description]", field.description) %>
-
     <% if field.format != "list" %>
     <%= labelled_form_field  _('Default value'), text_field_tag("custom_fields[#{id}][default_value]", field.default_value) %>
     <% end %>
