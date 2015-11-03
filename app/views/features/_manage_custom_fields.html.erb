@@ -5,7 +5,9 @@
 <% format_values_id = "#{customized_type.to_s.downcase}-formats" %>
 
 <%= form_tag({:action => 'manage_custom_fields'}, :id => "#{form_id}")  do %>
-<%= hidden_field '', 'customized_type', :value => customized_type.to_s %>
+
+<%= hidden_field_tag 'customized_type', customized_type.to_s %>
+
 <div id="<%= fields_id %>">
   <% customized_type.custom_fields.each do |field|%>
     <%= form_for_field(field, customized_type.to_s) %>

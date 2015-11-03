@@ -33,12 +33,14 @@ module CustomFieldsHelper
   end
 
   def form_for_field(field, customized_type)
-    render :partial => 'features/custom_fields/form', :locals => {:field => field, :customized_type => customized_type}
+    render :partial => 'features/custom_fields/form', :locals => {:field => field}
   end
 
   private
 
   def form_for_format(customized_type, format)
-    CGI::escapeHTML((render(:partial => 'features/custom_fields/form', :locals => {:customized_type => customized_type, :field => nil, :format => format})))
+    field = CustomField.new(:format => format, :customized_type => customized_type)
+
+    CGI::escapeHTML((render(:partial => 'features/custom_fields/form', :locals => {:field => field})))
   end
 end
