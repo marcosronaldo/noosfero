@@ -1,6 +1,6 @@
 <% id = field.new_record? ? "NEW_FIELD_ID" : field.id %>
 
-<div id="<%= id %>">
+<div id="<%= id %>" class="custom-field-item">
 <fieldset class="fieldbox">
   <legend><%= format_name(field.format) %></legend>
     <%= required labelled_form_field _('Name'), text_field_tag("custom_fields[#{id}][name]", field.name) %>
