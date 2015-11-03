@@ -55,9 +55,9 @@ class FeaturesController < AdminController
   def manage_custom_fields
     custom_field_list = params[:custom_fields] || {}
 
-    params[:customized_type].constantize.custom_fields.each do |cf|
-      cf.destroy if !custom_field_list.collect{|k,v|k}.include? cf.id
-    end
+    custom_fields_to_destroy =
+      params[:customized_type].constantize.custom_fields.map(&:id) - custom_field_list.keys.map(&:to_i)
+    CustomField.destroy(custom_fields_to_destroy)
 
     custom_field_list.each_pair do |id, custom_field|
       field = CustomField.find_by_id(id)

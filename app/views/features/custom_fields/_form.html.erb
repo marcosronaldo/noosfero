@@ -1,4 +1,4 @@
-<% id = field.new_record? ? "NEW_FIELD_ID" : "custom_field_#{field.id}" %>
+<% id = field.new_record? ? "NEW_FIELD_ID" : field.id %>
 
 <div id="<%= id %>">
 <fieldset class="fieldbox">
