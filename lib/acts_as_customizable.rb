@@ -52,11 +52,11 @@ module Customizable
       return is_valid if @custom_values.blank?
       @custom_values.each do |cv|
         if cv.value.blank? && cv.custom_field.required
-          errors.add(cv.custom_field.name,"can't be blank")
-          is_valid=false
+          errors.add(cv.custom_field.name, "can't be blank")
+          is_valid = false
         end
       end
-      success
+      is_valid
     end
 
     def customized_class
