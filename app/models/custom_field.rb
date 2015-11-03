@@ -14,7 +14,7 @@ class CustomField < ActiveRecord::Base
         ancestor = cf.customized_type.constantize < customized_type.constantize
         descendant = cf.customized_type.constantize > customized_type.constantize
         if ancestor || descendant
-          errors.add(:body,"New field related to existent one with same name")
+          errors.add(:body, N_("New field related to existent one with same name"))
           return false
         end
       end
