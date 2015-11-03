@@ -4,7 +4,7 @@
   <% profile.public_values.each do |cv|%>
     <tr>
       <td class="field-name"><%= cv.custom_field.name %></td>
-      <td><%= render :partial => "custom_fields/#{cv.custom_field}", :locals => {:value => profile.custom_value(cv.custom_field.name)} %></td>
+      <td><%= display_custom_field_value(cv) %></td>
     </tr>
   <% end%>
 <% end %>

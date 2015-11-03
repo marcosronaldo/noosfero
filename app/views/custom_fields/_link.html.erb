@@ -1,5 +1,0 @@
-<% title = value %>
-<% unless value[/\Ahttps?:\/\//i] %>
-   <% value = "http://#{value}" %>
- <% end %>
-<%= link_to title, value, :target => '_blank' %>
