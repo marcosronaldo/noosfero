@@ -165,4 +165,26 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal another_name, person.name
   end
 
+  should 'display public custom fields' do
+    some_person = create_user('some-person').person
+    CustomField.create!(:name => "Custom Blog", :format => "string", :customized_type => "Person", :active => true)
+    some_person.custom_values = { "Custom Blog" => { "value" => "www.blog.org", "public" => "1"} }
+    some_person.save!
+
+    # TODO
+    get "/api/v1/people/#{some_person.id}?#{params.to_query}"
+    assert_equal '', last_response.body
+  end
+
+  should 'not display non-public custom fields' do
+    some_person = create_user('some-person').person
+    CustomField.create!(:name => "Custom Blog", :format => "string", :customized_type => "Person", :active => true)
+    some_person.custom_values = { "Custom Blog" => { "value" => "www.blog.org", "public" => "0"} }
+    some_person.save!
+
+    # TODO
+    get "/api/v1/people/#{some_person.id}?#{params.to_query}"
+    assert_equal '', last_response.body
+  end
+
 end
