@@ -9,6 +9,7 @@ class CreateCustomFields < ActiveRecord::Migration
       t.boolean :active, :default => false
       t.boolean :required, :default => false
       t.boolean :signup, :default => false
+      t.integer :environment_id
       t.timestamps
     end
 

@@ -61,7 +61,7 @@ module Noosfero
 
             params[:person][:custom_values]={}
             params[:person].keys.each do |key|
-              params[:person][:custom_values][key]=params[:person].delete(key) if Person.custom_fields.any?{|cf| cf.name==key}
+              params[:person][:custom_values][key]=params[:person].delete(key) if Person.custom_fields(environment).any?{|cf| cf.name==key}
             end
 
             user = User.build(user_data, params[:person], environment)

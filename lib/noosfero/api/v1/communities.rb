@@ -32,7 +32,7 @@ module Noosfero
 
             params[:community][:custom_values]={}
             params[:community].keys.each do |key|
-              params[:community][:custom_values][key]=params[:community].delete(key) if Community.custom_fields.any?{|cf| cf.name==key}
+              params[:community][:custom_values][key]=params[:community].delete(key) if Community.custom_fields(environment).any?{|cf| cf.name==key}
             end
 
             begin

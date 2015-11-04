@@ -52,7 +52,7 @@ module CustomFieldsHelper
   private
 
   def form_for_format(customized_type, format)
-    field = CustomField.new(:format => format, :customized_type => customized_type)
+    field = CustomField.new(:format => format, :customized_type => customized_type, :environment => environment)
     CGI::escapeHTML((render(:partial => 'features/custom_fields/form', :locals => {:field => field})))
   end
 end
