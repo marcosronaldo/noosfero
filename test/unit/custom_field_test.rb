@@ -4,29 +4,39 @@ class CustomFieldTest < ActiveSupport::TestCase
 
   def setup
     @person = create_user('test_user').person
-    @community = create(Community, :environment => Environment.default, :name => 'my new community')
 
-    @community_custom_field = CustomField.create(:name => "community_field", :format=>"myFormat", :default_value => "value for community", :customized_type=>"Community", :active => true)
-    @person_custom_field = CustomField.create(:name => "person_field", :format=>"myFormat", :default_value => "value for person", :customized_type=>"Person", :active => true)
-    @profile_custom_field = CustomField.create(:name => "profile_field", :format=>"myFormat", :default_value => "value for any profile", :customized_type=>"Profile", :active => true)
+    @e1 = Environment.default
+    @e2 = fast_create(Environment)
+
+    @community = create(Community, :environment => @e1, :name => 'my new community')
+
+    @community_custom_field = CustomField.create(:name => "community_field", :format=>"myFormat", :default_value => "value for community", :customized_type=>"Community", :active => true, :environment => @e1)
+    @person_custom_field = CustomField.create(:name => "person_field", :format=>"myFormat", :default_value => "value for person", :customized_type=>"Person", :active => true, :environment => @e1)
+    @profile_custom_field = CustomField.create(:name => "profile_field", :format=>"myFormat", :default_value => "value for any profile", :customized_type=>"Profile", :active => true, :environment => @e1)
+
+    @e1.reload
   end
 
-  should 'create custom field' do
-    assert CustomField.all.any?{|cf| cf.name == @community_custom_field.name}
-    assert CustomField.all.any?{|cf| cf.name == @person_custom_field.name}
-    assert CustomField.all.any?{|cf| cf.name == @profile_custom_field.name}
+  should 'not access another environments custom fields' do
+    @e2_custom_field = CustomField.create(:name => "another_field", :format=>"anoherFormat", :default_value => "default value for e2", :customized_type=>"Profile", :active => true, :environment => @e2)
+    @e2.reload
 
-    assert Person.custom_fields.any?{|cf| cf.name == @person_custom_field.name}
+    assert_equal 1, Profile.custom_fields(@e1).size
+    assert_equal @profile_custom_field, Profile.custom_fields(@e1).first
+
+    assert_equal 1, Profile.custom_fields(@e2).size
+    assert_equal @e2_custom_field, Profile.custom_fields(@e2).first
+
   end
 
   should 'no access to custom field on sibling' do
-    assert !(Person.custom_fields.any?{|cf| cf.name == @community_custom_field.name})
-    assert !(Community.custom_fields.any?{|cf| cf.name == @person_custom_field.name})
+    assert !(Person.custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name})
+    assert !(Community.custom_fields(@e1).any?{|cf| cf.name == @person_custom_field.name})
   end
 
   should 'inheritance of custom_field' do
-    assert Community.custom_fields.any?{|cf| cf.name == @profile_custom_field.name}
-    assert Person.custom_fields.any?{|cf| cf.name == @profile_custom_field.name}
+    assert Community.custom_fields(@e1).any?{|cf| cf.name == @profile_custom_field.name}
+    assert Person.custom_fields(@e1).any?{|cf| cf.name == @profile_custom_field.name}
   end
 
   should 'save custom_field_values' do
@@ -44,21 +54,22 @@ class CustomFieldTest < ActiveSupport::TestCase
     old_id = @community_custom_field.id
     @community_custom_field.destroy
 
-    assert !(CustomField.all.any?{|cf| cf.id == old_id})
-    assert !(Community.custom_fields.any?{|cf| cf.name == "community_field"})
+    @e1.reload
+    assert !(@e1.custom_fields.any?{|cf| cf.id == old_id})
+    assert !(Community.custom_fields(@e1).any?{|cf| cf.name == "community_field"})
     assert !(CustomFieldValue.all.any?{|cv| cv.custom_field_id == old_id})
   end
 
   should 'not save related custom field' do
-    another_field = CustomField.create(:name => "profile_field", :format=>"myFormat", :default_value => "value for any profile", :customized_type=>"Community")
+    another_field = CustomField.create(:name => "profile_field", :format=>"myFormat", :default_value => "value for any profile", :customized_type=>"Community", :environment => @e1)
     assert another_field.id.nil?
   end
 
   should 'not return inactive fields' do
     @community_custom_field.active=false
     @community_custom_field.save!
-
-    assert !Community.active_custom_fields.any?{|cf| cf.name == @community_custom_field.name}
+    @e1.reload
+    assert !Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
   end
 
   should 'delete a model and its custom field values' do
@@ -78,34 +89,35 @@ class CustomFieldTest < ActiveSupport::TestCase
 
     @community_custom_field.active=false
     @community_custom_field.save!
-    assert !Community.active_custom_fields.any?{|cf| cf.name == @community_custom_field.name}
+    @e1.reload
+    assert !Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
     @community_custom_field.active=true
     @community_custom_field.save!
     @community.reload
-
-    assert Community.active_custom_fields.any?{|cf| cf.name == @community_custom_field.name}
+    @e1.reload
+    assert Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
     assert_equal @community.custom_value("community_field"), "new_value!"
   end
 
   should 'list of required fields' do
-    assert !Community.required_custom_fields.any?{|cf| cf.name == @community_custom_field.name}
+    assert !Community.required_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
     @community_custom_field.required=true
     @community_custom_field.save!
     @community.reload
-
-    assert Community.required_custom_fields.any?{|cf| cf.name == @community_custom_field.name}
+    @e1.reload
+    assert Community.required_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
   end
 
   should 'list of signup fields' do
-    assert !Community.signup_custom_fields.any?{|cf| cf.name == @community_custom_field.name}
+    assert !Community.signup_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
     @community_custom_field.signup=true
     @community_custom_field.save!
     @community.reload
-
-    assert Community.signup_custom_fields.any?{|cf| cf.name == @community_custom_field.name}
+    @e1.reload
+    assert Community.signup_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
   end
 
   should 'public values handling' do
@@ -118,12 +130,11 @@ class CustomFieldTest < ActiveSupport::TestCase
   end
 
   should 'complete list of fields' do
-    assert Person.custom_fields.include? @profile_custom_field
-    assert Person.custom_fields.include? @person_custom_field
+    assert Person.custom_fields(@e1).include? @profile_custom_field
+    assert Person.custom_fields(@e1).include? @person_custom_field
   end
 
   should 'get correct customized ancestors list' do
-    puts Person.customized_ancestors_list
     assert (Person.customized_ancestors_list-["Person","Profile"]).blank?
   end
 end

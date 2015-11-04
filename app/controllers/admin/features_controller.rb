@@ -56,7 +56,7 @@ class FeaturesController < AdminController
     custom_field_list = params[:custom_fields] || {}
 
     custom_fields_to_destroy =
-      params[:customized_type].constantize.custom_fields.map(&:id) - custom_field_list.keys.map(&:to_i)
+      params[:customized_type].constantize.custom_fields(environment).map(&:id) - custom_field_list.keys.map(&:to_i)
     CustomField.destroy(custom_fields_to_destroy)
 
     custom_field_list.each_pair do |id, custom_field|
@@ -73,6 +73,7 @@ class FeaturesController < AdminController
           custom_field[:extras] = tmp
         end
         field =  CustomField.new custom_field
+        field.environment=environment
         field.save if field.valid?
       end
     end

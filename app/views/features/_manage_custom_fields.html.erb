@@ -9,7 +9,7 @@
 <%= hidden_field_tag 'customized_type', customized_type.to_s %>
 
 <div id="<%= fields_id %>">
-  <% customized_type.custom_fields.each do |field|%>
+  <% customized_type.custom_fields(environment).each do |field|%>
     <%= form_for_field(field, customized_type.to_s) %>
   <% end %>
 </div>

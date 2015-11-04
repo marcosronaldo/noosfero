@@ -13,20 +13,20 @@ module Customizable
       validate :valid_custom_values?
     end
 
-    def active_custom_fields
-      CustomField.all.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.active}
+    def active_custom_fields environment
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.active}
     end
 
-    def required_custom_fields
-      CustomField.all.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.required}
+    def required_custom_fields environment
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.required}
     end
 
-    def signup_custom_fields
-      CustomField.all.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.signup}
+    def signup_custom_fields environment
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.signup}
     end
 
-    def custom_fields
-      CustomField.all.select{|cf| customized_ancestors_list.include?(cf.customized_type)}
+    def custom_fields environment
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type)}
     end
 
     def customized_ancestors_list
@@ -89,7 +89,7 @@ module Customizable
     def custom_values
       if @custom_values.blank?
         @custom_values=[]
-        self.class.custom_fields.each do |field|
+        self.class.custom_fields(environment).each do |field|
           v = ValueWrapper.new
           v.customized=self
           v.custom_field = field
@@ -126,7 +126,7 @@ module Customizable
     end
 
     def default_value_for(field_name)
-      field=self.class.custom_fields.detect {|c| c.name == field_name}
+      field=self.class.custom_fields(environment).detect {|c| c.name == field_name}
       field.nil? ? nil : field.default_value
     end
 

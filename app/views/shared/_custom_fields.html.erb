@@ -1,7 +1,7 @@
 <% if signup ||= false %>
-  <% fields = profile.class.signup_custom_fields %>
+  <% fields = profile.class.signup_custom_fields environment%>
 <% else %>
-  <% fields = profile.class.active_custom_fields %>
+  <% fields = profile.class.active_custom_fields environment%>
 <% end %>
 <% editing_profile ||= false %>
 <% fields.each do |field| %>
