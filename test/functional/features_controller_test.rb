@@ -196,32 +196,49 @@ class FeaturesControllerTest < ActionController::TestCase
 
   should 'create custom field' do
     uses_host 'anhetegua.net'
-    post :create_custom_field, :custom_field => {:name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true}
+    assert_nil CustomField.find_by_name('foo')
+    post :manage_custom_fields, :customized_type => 'Person', :custom_fields => {
+      Time.now.to_i => {
+        :name => 'foo',
+        :default_value => 'foobar',
+        :format => 'string',
+        :customized_type => 'Person',
+        :active => true,
+        :required => true,
+        :signup => true
+      }
+    }
     assert_redirected_to :action => 'manage_fields'
-    assert_equal _('Custom Field updated successfully.'), session[:notice]
+    assert_not_nil CustomField.find_by_name('foo')
   end
 
   should 'update custom field' do
     uses_host 'anhetegua.net'
 
-    field = CustomField.new :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
-    field.save
+    field = CustomField.create! :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
+    post :manage_custom_fields, :customized_type => 'Enterprise', :custom_fields => {
+      field.id => {
+        :name => 'foo bar',
+        :default_value => 'foobar',
+        :active => true,
+        :required => true,
+        :signup => true
+      }
+    }
     field.reload
-
-    post :update_custom_field, {:id => field.id, :custom_field => {:name => 'Foo', :default_value => 'foobar', :active => true, :required => true, :signup => true}}
     assert_redirected_to :action => 'manage_fields'
-    assert_equal _('Custom Field updated successfully.'), session[:notice]
+    assert_equal 'foo bar', field.name
   end
 
   should 'destroy custom field' do
     uses_host 'anhetegua.net'
 
-    field = CustomField.new :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
-    field.save
-    field.reload
+    field = CustomField.create! :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
 
-    post :destroy_custom_field, :id => field.id
+    post :manage_custom_fields, :customized_type => 'Enterprise', :custom_fields => {
+    }
     assert_redirected_to :action => 'manage_fields'
-    assert_equal _('Custom Field deleted successfully.'), session[:notice]
+    assert_nil CustomField.find_by_name('foo')
   end
+
 end
