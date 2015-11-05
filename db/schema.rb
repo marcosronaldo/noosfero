@@ -297,7 +297,6 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
 
   create_table "custom_fields", :force => true do |t|
     t.string   "name"
-    t.string   "description",     :default => ""
     t.string   "format",          :default => ""
     t.text     "default_value",   :default => ""
     t.string   "customized_type"
@@ -305,6 +304,7 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
     t.boolean  "active",          :default => false
     t.boolean  "required",        :default => false
     t.boolean  "signup",          :default => false
+    t.integer  "environment_id"
     t.datetime "created_at",                         :null => false
     t.datetime "updated_at",                         :null => false
   end
