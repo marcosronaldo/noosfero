@@ -17,7 +17,7 @@ class ActsAsCustomizableTest < ActiveSupport::TestCase
     person = create_user('testinguser').person
 
     person.custom_values = { "Blog" => { "value" => "", "public" => "0"} }
-    refuse person.valid?
+    refute person.valid?
   end
 
 end

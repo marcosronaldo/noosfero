@@ -7,6 +7,6 @@ class CustomFieldValuesTest < ActiveSupport::TestCase
     person = create_user('testinguser').person
 
     cv=CustomFieldValue.new(:customized => person, :custom_field => c, :value => "")
-    refuse cv.valid?
+    refute cv.valid?
   end
 end
