@@ -311,10 +311,6 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
 
   add_index "custom_fields", ["customized_type", "name"], :name => "index_custom_field", :unique => true
 
-  create_table "database_descriptions", :force => true do |t|
-    t.string "name"
-  end
-
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
     t.integer  "attempts",   :default => 0
@@ -435,18 +431,6 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
   add_index "inputs", ["product_category_id"], :name => "index_inputs_on_product_category_id"
   add_index "inputs", ["product_id"], :name => "index_inputs_on_product_id"
 
-  create_table "libraries", :force => true do |t|
-    t.string  "name"
-    t.string  "version"
-    t.string  "license"
-    t.integer "software_info_id"
-  end
-
-  create_table "license_infos", :force => true do |t|
-    t.string "version"
-    t.string "link"
-  end
-
   create_table "licenses", :force => true do |t|
     t.string  "name",           :null => false
     t.string  "slug",           :null => false
@@ -488,40 +472,6 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
 
   add_index "national_regions", ["name"], :name => "name_index"
   add_index "national_regions", ["national_region_code"], :name => "code_index"
-
-  create_table "operating_system_names", :force => true do |t|
-    t.string "name"
-  end
-
-  create_table "operating_systems", :force => true do |t|
-    t.string  "version"
-    t.integer "software_info_id"
-    t.integer "operating_system_name_id"
-  end
-
-  create_table "organization_ratings", :force => true do |t|
-    t.integer  "organization_id"
-    t.integer  "person_id"
-    t.integer  "comment_id"
-    t.integer  "value"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
-    t.integer  "people_benefited"
-    t.decimal  "saved_value"
-  end
-
-  create_table "organization_ratings_configs", :force => true do |t|
-    t.integer "environment_id"
-    t.integer "cooldown",       :default => 24
-    t.integer "integer",        :default => 10
-    t.integer "default_rating", :default => 1
-    t.string  "order",          :default => "recent"
-    t.string  "string",         :default => "recent"
-    t.integer "per_page",       :default => 10
-    t.boolean "vote_once",      :default => false
-    t.boolean "boolean",        :default => true
-    t.boolean "are_moderated",  :default => true
-  end
 
   create_table "price_details", :force => true do |t|
     t.decimal  "price",              :default => 0.0
@@ -642,7 +592,6 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
     t.boolean  "allow_members_to_invite",               :default => true
     t.boolean  "invite_friends_only",                   :default => false
     t.boolean  "secret",                                :default => false
-    t.integer  "comments_count"
   end
 
   add_index "profiles", ["activities_count"], :name => "index_profiles_on_activities_count"
@@ -654,10 +603,6 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
   add_index "profiles", ["region_id"], :name => "index_profiles_on_region_id"
   add_index "profiles", ["user_id", "type"], :name => "index_profiles_on_user_id_and_type"
   add_index "profiles", ["user_id"], :name => "index_profiles_on_user_id"
-
-  create_table "programming_languages", :force => true do |t|
-    t.string "name"
-  end
 
   create_table "qualifier_certifiers", :force => true do |t|
     t.integer "qualifier_id"
@@ -754,65 +699,6 @@ ActiveRecord::Schema.define(:version => 20150921140802) do
   add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
   add_index "sessions", ["user_id"], :name => "index_sessions_on_user_id"
-
-  create_table "software_categories", :force => true do |t|
-    t.integer "software_info_id"
-    t.boolean "administration"
-    t.boolean "agriculture"
-    t.boolean "business_and_services"
-    t.boolean "communication"
-    t.boolean "culture"
-    t.boolean "national_defense"
-    t.boolean "economy_and_finances"
-    t.boolean "education"
-    t.boolean "energy"
-    t.boolean "sports"
-    t.boolean "habitation"
-    t.boolean "industry"
-    t.boolean "environment"
-    t.boolean "research_and_development"
-    t.boolean "social_security"
-    t.boolean "social_protection"
-    t.boolean "international_relations"
-    t.boolean "sanitation"
-    t.boolean "health"
-    t.boolean "security_public_order"
-    t.boolean "work"
-    t.boolean "transportation"
-    t.boolean "urbanism"
-  end
-
-  create_table "software_databases", :force => true do |t|
-    t.string  "version"
-    t.integer "database_description_id"
-    t.integer "software_info_id"
-  end
-
-  create_table "software_infos", :force => true do |t|
-    t.integer "license_info_id"
-    t.integer "community_id"
-    t.boolean "e_mag",                             :default => false
-    t.boolean "icp_brasil",                        :default => false
-    t.boolean "intern",                            :default => false
-    t.boolean "e_ping",                            :default => false
-    t.boolean "e_arq",                             :default => false
-    t.string  "operating_platform"
-    t.string  "demonstration_url"
-    t.string  "acronym"
-    t.text    "objectives"
-    t.text    "features"
-    t.string  "finality",           :limit => 140
-    t.string  "repository_link"
-    t.boolean "public_software",                   :default => false
-    t.boolean "first_edit",                        :default => true
-    t.text    "settings"
-  end
-
-  create_table "software_languages", :force => true do |t|
-    t.integer "software_info_id"
-    t.integer "programming_language_id"
-    t.string  "version"
-  end
 
   create_table "suggestion_connections", :force => true do |t|
     t.integer "suggestion_id",   :null => false
