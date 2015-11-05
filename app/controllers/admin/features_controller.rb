@@ -62,7 +62,7 @@ class FeaturesController < AdminController
     custom_field_list.each_pair do |id, custom_field|
       field = CustomField.find_by_id(id)
       if not field.blank?
-        params_to_update = custom_field.except(:format, :extras, :customized_type)
+        params_to_update = custom_field.except(:format, :extras, :customized_type,:environment)
         field.update_attributes(params_to_update)
       else
         if !custom_field[:extras].nil?
@@ -72,7 +72,7 @@ class FeaturesController < AdminController
           end
           custom_field[:extras] = tmp
         end
-        field =  CustomField.new custom_field
+        field =  CustomField.new custom_field.except(:environment)
         field.environment=environment
         field.save if field.valid?
       end
