@@ -30,8 +30,8 @@ class CustomFieldTest < ActiveSupport::TestCase
   end
 
   should 'no access to custom field on sibling' do
-    refuse (Person.custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name})
-    refuse (Community.custom_fields(@e1).any?{|cf| cf.name == @person_custom_field.name})
+    refute (Person.custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name})
+    refute (Community.custom_fields(@e1).any?{|cf| cf.name == @person_custom_field.name})
   end
 
   should 'inheritance of custom_field' do
@@ -55,9 +55,9 @@ class CustomFieldTest < ActiveSupport::TestCase
     @community_custom_field.destroy
 
     @e1.reload
-    refuse (@e1.custom_fields.any?{|cf| cf.id == old_id})
-    refuse (Community.custom_fields(@e1).any?{|cf| cf.name == "community_field"})
-    refuse (CustomFieldValue.all.any?{|cv| cv.custom_field_id == old_id})
+    refute (@e1.custom_fields.any?{|cf| cf.id == old_id})
+    refute (Community.custom_fields(@e1).any?{|cf| cf.name == "community_field"})
+    refute (CustomFieldValue.all.any?{|cv| cv.custom_field_id == old_id})
   end
 
   should 'not save related custom field' do
@@ -69,7 +69,7 @@ class CustomFieldTest < ActiveSupport::TestCase
     @community_custom_field.active=false
     @community_custom_field.save!
     @e1.reload
-    refuse Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
+    refute Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
   end
 
   should 'delete a model and its custom field values' do
@@ -78,8 +78,8 @@ class CustomFieldTest < ActiveSupport::TestCase
 
     old_id = @community.id
     @community.destroy
-    refuse (Community.all.any?{|c| c.id == old_id})
-    refuse (CustomFieldValue.all.any?{|cv| cv.customized_id == old_id && cv.customized_type == "Community"})
+    refute (Community.all.any?{|c| c.id == old_id})
+    refute (CustomFieldValue.all.any?{|cv| cv.customized_id == old_id && cv.customized_type == "Community"})
   end
 
   should 'keep field value if the field is reactivated' do
@@ -90,7 +90,7 @@ class CustomFieldTest < ActiveSupport::TestCase
     @community_custom_field.active=false
     @community_custom_field.save!
     @e1.reload
-    refuse Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
+    refute Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
     @community_custom_field.active=true
     @community_custom_field.save!
@@ -101,7 +101,7 @@ class CustomFieldTest < ActiveSupport::TestCase
   end
 
   should 'list of required fields' do
-    refuse Community.required_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
+    refute Community.required_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
     @community_custom_field.required=true
     @community_custom_field.save!
@@ -111,7 +111,7 @@ class CustomFieldTest < ActiveSupport::TestCase
   end
 
   should 'list of signup fields' do
-    refuse Community.signup_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
+    refute Community.signup_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
     @community_custom_field.signup=true
     @community_custom_field.save!
@@ -121,12 +121,12 @@ class CustomFieldTest < ActiveSupport::TestCase
   end
 
   should 'public values handling' do
-    refuse @community.is_public("community_field")
+    refute @community.is_public("community_field")
     @community.custom_values = {"community_field" => {"value" => "new_value!", "public"=>"true"}, "profile_field"=> "another_value!"}
     @community.save
 
     assert @community.is_public("community_field")
-    refuse @community.is_public("profile_field")
+    refute @community.is_public("profile_field")
   end
 
   should 'complete list of fields' do
