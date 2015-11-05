@@ -12,13 +12,6 @@ class FeaturesControllerTest < ActionController::TestCase
     @request    = ActionController::TestRequest.new
     @response   = ActionController::TestResponse.new
 
-    @person_custom_field = CustomField.new :name => 'my person custom field', :format => 'string',:customized_type => 'Person'
-    @person_custom_field.save
-    @community_custom_field = CustomField.new :name => 'my community custom field', :format => 'string', :customized_type => 'Community'
-    @community_custom_field.save
-    @enterprise_custom_field = CustomField.new :name => 'my enterprise custom field', :format => 'string', :customized_type => 'Enterprise'
-    @enterprise_custom_field.save
-
     login_as(create_admin_user(Environment.find(2)))
   end
 
@@ -93,33 +86,6 @@ class FeaturesControllerTest < ActionController::TestCase
       assert_tag(:tag => 'input', :attributes => { :type => 'checkbox', :name => "person_fields[#{field}][active]"})
       assert_tag(:tag => 'input', :attributes => { :type => 'checkbox', :name => "person_fields[#{field}][required]"})
       assert_tag(:tag => 'input', :attributes => { :type => 'checkbox', :name => "person_fields[#{field}][signup]"})
-    end
-  end
-
-  should 'list possible custom fields' do
-    uses_host 'anhetegua.net'
-    get :manage_fields
-    assert_template 'manage_fields'
-
-    assert_equal 1, Person.custom_fields.size
-    Person.custom_fields.each do |field|
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
-    end
-
-    assert_equal 1, Community.custom_fields.size
-    Community.custom_fields.each do |field|
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
-    end
-
-    assert_equal 1, Enterprise.custom_fields.size
-    Enterprise.custom_fields.each do |field|
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_name[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_format[#{field.name}]"})
-      assert_tag(:tag => 'span', :attributes => {:name => "custom_field_controls[#{field.name}]"})
     end
   end
 
@@ -199,7 +165,7 @@ class FeaturesControllerTest < ActionController::TestCase
 
   should 'create custom field' do
     uses_host 'anhetegua.net'
-    assert_nil CustomField.find_by_name('foo')
+    assert_nil Environment.find(2).custom_fields.find_by_name('foo')
     post :manage_custom_fields, :customized_type => 'Person', :custom_fields => {
       Time.now.to_i => {
         :name => 'foo',
@@ -212,13 +178,13 @@ class FeaturesControllerTest < ActionController::TestCase
       }
     }
     assert_redirected_to :action => 'manage_fields'
-    assert_not_nil CustomField.find_by_name('foo')
+    assert_not_nil Environment.find(2).custom_fields.find_by_name('foo')
   end
 
   should 'update custom field' do
     uses_host 'anhetegua.net'
 
-    field = CustomField.create! :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
+    field = CustomField.create! :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true, :environment => Environment.find(2)
     post :manage_custom_fields, :customized_type => 'Enterprise', :custom_fields => {
       field.id => {
         :name => 'foo bar',
@@ -236,12 +202,12 @@ class FeaturesControllerTest < ActionController::TestCase
   should 'destroy custom field' do
     uses_host 'anhetegua.net'
 
-    field = CustomField.create! :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true
+    field = CustomField.create! :name => 'foo', :default_value => 'foobar', :format => 'string', :extras => '', :customized_type => 'Enterprise', :active => true, :required => true, :signup => true, :environment => Environment.find(2)
 
-    post :manage_custom_fields, :customized_type => 'Enterprise', :custom_fields => {
-    }
+    post :manage_custom_fields, :customized_type => 'Enterprise'
+
     assert_redirected_to :action => 'manage_fields'
-    assert_nil CustomField.find_by_name('foo')
+    assert_nil Environment.find(2).custom_fields.find_by_name('foo')
   end
 
 end
