@@ -14,19 +14,23 @@ module Customizable
     end
 
     def active_custom_fields environment
-      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.active}
+      e = environment || Environment.default
+      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.active}
     end
 
     def required_custom_fields environment
-      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.required}
+      e = environment || Environment.default
+      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.required}
     end
 
     def signup_custom_fields environment
-      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.signup}
+      e = environment || Environment.default
+      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.signup}
     end
 
     def custom_fields environment
-      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type)}
+      e = environment || Environment.default
+      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type)}
     end
 
     def customized_ancestors_list

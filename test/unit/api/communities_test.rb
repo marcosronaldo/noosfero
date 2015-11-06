@@ -65,6 +65,17 @@ class CommunitiesTest < ActiveSupport::TestCase
     assert_equal 400, last_response.status
   end
 
+  should 'create a community with custom field' do
+    community_field = CustomField.create(:name => "community_field", :format=>"myFormat", :default_value => "value for community", :customized_type=>"Community", :active => true, :environment => Environment.default)
+    params[:community] = {:name => 'some', 'community_field' => 'valor bacana'}
+    post "/api/v1/communities?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+    puts json
+    assert json['community']['additional_data'].has_key?('community_field')
+    assert_equal 'valor bacana', json['community']['additional_data']['community_field']
+
+  end
+
   should 'get community' do
     community = fast_create(Community)
 
