@@ -1,6 +1,7 @@
 module Customizable
 
   def self.included(base)
+    base.attr_accessible :custom_values
     base.extend ClassMethods
   end
 
@@ -10,7 +11,7 @@ module Customizable
       has_many :custom_field_values, :dependent => :delete_all, :as => :customized
       send :include, Customizable::InstanceMethods
       after_save :save_custom_values
-      #validate :valid_custom_values?
+      validate :valid_custom_values?
     end
 
     def active_custom_fields environment
@@ -45,10 +46,11 @@ module Customizable
 
     def valid_custom_values?
       is_valid = true
-      return is_valid if @custom_values.blank?
-      @custom_values.each do |cv|
-        if cv.value.blank? && cv.custom_field.required
-          errors.add(cv.custom_field.name, "can't be blank")
+      parse_custom_values.each do |cv|
+        unless cv.valid?
+          name = cv.custom_field.name
+          errors.add(name, cv.errors.messages[name.to_sym].first)
+          #errors.add(cv.custom_field.name, "can't be blank")
           is_valid = false
         end
       end
@@ -65,19 +67,16 @@ module Customizable
     end
 
     def is_public(field_name)
-      cv = @custom_values.detect{|value| value.custom_field.name == field_name} unless @custom_values.blank?
-      cv ||= CustomFieldValue.all.detect {|cv| belongs_to_self(cv) && cv.custom_field.name == field_name}
+      cv = self.custom_field_values.detect{|cv| cv.custom_field.name==field_name}
       cv.nil? ? false : cv.public
     end
 
     def public_values
-      cv = @custom_values.select{|value| value.public} unless @custom_values.blank?
       cv ||= CustomFieldValue.all.select {|cv| belongs_to_self(cv) && cv.public}
       cv
     end
 
     def custom_value(field_name)
-      cv = @custom_values.detect{|value| value.custom_field.name == field_name} unless @custom_values.blank?
       cv ||= CustomFieldValue.all.detect {|cv| belongs_to_self(cv) && cv.custom_field.name == field_name}
       cv.nil? ? default_value_for(field_name) : cv.value
     end
@@ -93,8 +92,8 @@ module Customizable
       field.nil? ? nil : field.default_value
     end
 
-    def save_custom_values
-      return false if custom_values.blank?
+    def parse_custom_values
+      return_list = []
 
       custom_values.each_pair do |key, value|
         custom_field = environment.custom_fields.detect{|cf|cf.name==key}
@@ -120,9 +119,13 @@ module Customizable
           custom_field_value.public = false
         end
 
-        custom_field_value.save
+        return_list << custom_field_value
       end
-      true
+      return_list
+    end
+
+    def save_custom_values
+      parse_custom_values.each(&:save)
     end
 
   end
