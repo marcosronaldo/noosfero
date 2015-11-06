@@ -1,36 +1,32 @@
 module Customizable
 
   def self.included(base)
-    base.attr_accessible :custom_values
     base.extend ClassMethods
   end
 
   module ClassMethods
     def acts_as_customizable(options = {})
+      attr_accessor :custom_values
       has_many :custom_field_values, :dependent => :delete_all, :as => :customized
       send :include, Customizable::InstanceMethods
       after_save :save_custom_values
-      validate :valid_custom_values?
+      #validate :valid_custom_values?
     end
 
     def active_custom_fields environment
-      e = environment || Environment.default
-      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.active}
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.active}
     end
 
     def required_custom_fields environment
-      e = environment || Environment.default
-      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.required}
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.required}
     end
 
     def signup_custom_fields environment
-      e = environment || Environment.default
-      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.signup}
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type) && cf.signup}
     end
 
     def custom_fields environment
-      e = environment || Environment.default
-      e.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type)}
+      environment.custom_fields.select{|cf| customized_ancestors_list.include?(cf.customized_type)}
     end
 
     def customized_ancestors_list
@@ -43,10 +39,6 @@ module Customizable
       result
     end
 
-  end
-
-  class ValueWrapper
-    attr_accessor :value, :customized, :custom_field, :public
   end
 
   module InstanceMethods
@@ -70,39 +62,6 @@ module Customizable
         current=current.superclass
       end
       result.name
-    end
-
-    def custom_values=(values)
-      values = values.stringify_keys
-      @custom_values=nil
-      @custom_values=custom_values
-      @custom_values.each do |custom_value|
-        key = custom_value.custom_field.name
-        unless !values.has_key?(key)
-          if values[key].is_a?(Hash)
-            custom_value.value = values[key]['value'].to_s
-            custom_value.public = values[key].has_key?('public') ? values[key]['public']=="true" : false
-          else
-            custom_value.value = values[key].to_s
-            custom_value.public = false
-          end
-        end
-      end
-    end
-
-    def custom_values
-      if @custom_values.blank?
-        @custom_values=[]
-        self.class.custom_fields(environment).each do |field|
-          v = ValueWrapper.new
-          v.customized=self
-          v.custom_field = field
-          v.public = is_public(field.name)
-          v.value = custom_value(field.name)
-          @custom_values << v
-        end
-      end
-      @custom_values
     end
 
     def is_public(field_name)
@@ -135,27 +94,35 @@ module Customizable
     end
 
     def save_custom_values
-      return false if @custom_values.blank?
-      custom_values_to_save = []
-      @custom_values.each do |custom_value|
-        value = CustomFieldValue.all.detect {|cv| belongs_to_self(cv) && cv.custom_field.name == custom_value.custom_field.name}
-        if value.nil?
-          value = CustomFieldValue.new
-          value.custom_field = custom_value.custom_field
-          value.customized = self
+      return false if custom_values.blank?
+
+      custom_values.each_pair do |key, value|
+        custom_field = environment.custom_fields.detect{|cf|cf.name==key}
+        next if custom_field.blank?
+        custom_field_value = CustomFieldValue.all.detect{|cv| belongs_to_self(cv) && cv.custom_field.name == key}
+
+        if custom_field_value.nil?
+          custom_field_value = CustomFieldValue.new
+          custom_field_value.custom_field = custom_field
+          custom_field_value.customized = self
         end
 
-        value.public = custom_value.public
-        value.value = custom_value.value
-        custom_values_to_save << value
-      end
-      custom_field_values = custom_values_to_save
-      custom_field_values.each(&:save)
-      true
-    end
+        if value.is_a?(Hash)
+          custom_field_value.value = value['value'].to_s
+          if value.has_key?('public')
+            is_public = value['public']=="true" || value['public']==true
+            custom_field_value.public = is_public
+          else
+            custom_field_value.public = false
+          end
+        else
+          custom_field_value.value = value.to_s
+          custom_field_value.public = false
+        end
 
-    def reset_custom_values!
-      @custom_values = nil
+        custom_field_value.save
+      end
+      true
     end
 
   end
