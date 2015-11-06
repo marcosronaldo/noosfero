@@ -65,6 +65,20 @@ class CustomFieldTest < ActiveSupport::TestCase
     assert another_field.id.nil?
   end
 
+  should 'not save same custom field twice in the same environment' do
+    field = CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
+    refute field.id.nil?
+    another_field = CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
+    assert another_field.id.nil?
+  end
+
+  should 'save same custom field in another environment' do
+    field = CustomField.create!(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
+    refute field.id.nil?
+    another_field = CustomField.create!(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e2)
+    refute another_field.id.nil?
+  end
+
   should 'not return inactive fields' do
     @community_custom_field.active=false
     @community_custom_field.save!

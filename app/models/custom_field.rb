@@ -6,7 +6,7 @@ class CustomField < ActiveRecord::Base
   belongs_to :environment
 
   validates_presence_of :name, :format, :customized_type, :environment
-  validates_uniqueness_of :name
+  validates_uniqueness_of :name, :scope => [:environment_id, :customized_type]
   validate :related_to_other?
 
   def related_to_other?

@@ -22,8 +22,9 @@ class CreateCustomFields < ActiveRecord::Migration
       t.timestamps
     end
 
+
     add_index :custom_field_values, ["customized_type", "customized_id","custom_field_id"], :unique => true, :name => 'index_custom_field_values'
-    add_index :custom_fields, ["customized_type","name"], :unique => true, :name => 'index_custom_field'
+    add_index :custom_fields, ["customized_type","name","environment_id"], :unique => true, :name => 'index_custom_field'
 
   end
 end
