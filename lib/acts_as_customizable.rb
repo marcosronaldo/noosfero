@@ -50,7 +50,6 @@ module Customizable
         unless cv.valid?
           name = cv.custom_field.name
           errors.add(name, cv.errors.messages[name.to_sym].first)
-          #errors.add(cv.custom_field.name, "can't be blank")
           is_valid = false
         end
       end
@@ -72,19 +71,12 @@ module Customizable
     end
 
     def public_values
-      cv ||= CustomFieldValue.all.select {|cv| belongs_to_self(cv) && cv.public}
-      cv
+      self.custom_field_values.select{|cv| cv.public}
     end
 
     def custom_value(field_name)
-      cv ||= CustomFieldValue.all.detect {|cv| belongs_to_self(cv) && cv.custom_field.name == field_name}
+      cv = self.custom_field_values.detect{|cv| cv.custom_field.name==field_name}
       cv.nil? ? default_value_for(field_name) : cv.value
-    end
-
-    def belongs_to_self(value)
-      inherited_or_self_type = self.class.customized_ancestors_list.include?(value.customized_type)
-      correct_id = value.customized_id == self.id
-      inherited_or_self_type && correct_id
     end
 
     def default_value_for(field_name)
@@ -94,11 +86,11 @@ module Customizable
 
     def parse_custom_values
       return_list = []
-
+      return return_list if custom_values.blank?
       custom_values.each_pair do |key, value|
         custom_field = environment.custom_fields.detect{|cf|cf.name==key}
         next if custom_field.blank?
-        custom_field_value = CustomFieldValue.all.detect{|cv| belongs_to_self(cv) && cv.custom_field.name == key}
+        custom_field_value = self.custom_field_values.detect{|cv| cv.custom_field.name==key}
 
         if custom_field_value.nil?
           custom_field_value = CustomFieldValue.new
@@ -118,7 +110,6 @@ module Customizable
           custom_field_value.value = value.to_s
           custom_field_value.public = false
         end
-
         return_list << custom_field_value
       end
       return_list
@@ -126,6 +117,7 @@ module Customizable
 
     def save_custom_values
       parse_custom_values.each(&:save)
+      reload
     end
 
   end

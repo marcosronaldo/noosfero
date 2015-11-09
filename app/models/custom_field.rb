@@ -6,8 +6,16 @@ class CustomField < ActiveRecord::Base
   belongs_to :environment
 
   validates_presence_of :name, :format, :customized_type, :environment
-  validates_uniqueness_of :name, :scope => [:environment_id, :customized_type]
   validate :related_to_other?
+  validate :unique?
+
+  def unique?
+    if environment.custom_fields.any?{|cf| cf.name==name && cf.environment == environment && cf.customized_type==customized_type}
+      errors.add(:body, N_("There is a field with the same name for this type in this environment"))
+      return false
+    end
+    true
+  end
 
   def related_to_other?
     environment.custom_fields.any? do |cf|
