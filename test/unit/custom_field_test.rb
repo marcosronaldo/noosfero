@@ -68,14 +68,16 @@ class CustomFieldTest < ActiveSupport::TestCase
   should 'not save same custom field twice in the same environment' do
     field = CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
     refute field.id.nil?
-    another_field = CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
-    assert another_field.id.nil?
+
+    assert_raise ActiveRecord::RecordNotUnique do
+      CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
+    end
   end
 
   should 'save same custom field in another environment' do
-    field = CustomField.create!(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
+    field = CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
     refute field.id.nil?
-    another_field = CustomField.create!(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e2)
+    another_field = CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e2)
     refute another_field.id.nil?
   end
 
@@ -108,7 +110,7 @@ class CustomFieldTest < ActiveSupport::TestCase
 
     @community_custom_field.active=true
     @community_custom_field.save!
-    @community.reload
+
     @e1.reload
     assert Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
     assert_equal @community.custom_value("community_field"), "new_value!"
