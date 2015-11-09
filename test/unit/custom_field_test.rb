@@ -68,10 +68,9 @@ class CustomFieldTest < ActiveSupport::TestCase
   should 'not save same custom field twice in the same environment' do
     field = CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
     refute field.id.nil?
-
-    assert_raise ActiveRecord::RecordNotUnique do
-      CustomField.create(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
-    end
+    @e1.reload
+    another = CustomField.new(:name => "the new field", :format=>"myFormat", :customized_type=>"Community", :environment => @e1)
+    refute another.valid?
   end
 
   should 'save same custom field in another environment' do
@@ -82,8 +81,7 @@ class CustomFieldTest < ActiveSupport::TestCase
   end
 
   should 'not return inactive fields' do
-    @community_custom_field.active=false
-    @community_custom_field.save!
+    @community_custom_field.update_attributes(:active=>false)
     @e1.reload
     refute Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
   end
@@ -103,13 +101,11 @@ class CustomFieldTest < ActiveSupport::TestCase
     @community.custom_values = {"community_field" => "new_value!"}
     @community.save
 
-    @community_custom_field.active=false
-    @community_custom_field.save!
+    @community_custom_field.update_attributes(:active=>false)
     @e1.reload
     refute Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
-    @community_custom_field.active=true
-    @community_custom_field.save!
+    @community_custom_field.update_attributes(:active=>true)
 
     @e1.reload
     assert Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
@@ -119,8 +115,7 @@ class CustomFieldTest < ActiveSupport::TestCase
   should 'list of required fields' do
     refute Community.required_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
-    @community_custom_field.required=true
-    @community_custom_field.save!
+    @community_custom_field.update_attributes(:required=>true)
     @community.reload
     @e1.reload
     assert Community.required_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
@@ -129,8 +124,7 @@ class CustomFieldTest < ActiveSupport::TestCase
   should 'list of signup fields' do
     refute Community.signup_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
 
-    @community_custom_field.signup=true
-    @community_custom_field.save!
+    @community_custom_field.update_attributes(:signup=>true)
     @community.reload
     @e1.reload
     assert Community.signup_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}

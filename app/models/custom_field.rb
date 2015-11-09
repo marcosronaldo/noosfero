@@ -10,7 +10,7 @@ class CustomField < ActiveRecord::Base
   validate :unique?
 
   def unique?
-    if environment.custom_fields.any?{|cf| cf.name==name && cf.environment == environment && cf.customized_type==customized_type}
+    if environment.custom_fields.any?{|cf| cf.name==name && cf.environment == environment && cf.customized_type==customized_type && new_record?}
       errors.add(:body, N_("There is a field with the same name for this type in this environment"))
       return false
     end
