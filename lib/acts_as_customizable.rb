@@ -117,7 +117,6 @@ module Customizable
 
     def save_custom_values
       parse_custom_values.each(&:save)
-      reload
     end
 
   end
