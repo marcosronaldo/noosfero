@@ -108,6 +108,7 @@ class CustomFieldTest < ActiveSupport::TestCase
     @community_custom_field.update_attributes(:active=>true)
 
     @e1.reload
+    @community.reload
     assert Community.active_custom_fields(@e1).any?{|cf| cf.name == @community_custom_field.name}
     assert_equal @community.custom_value("community_field"), "new_value!"
   end
@@ -134,6 +135,7 @@ class CustomFieldTest < ActiveSupport::TestCase
     refute @community.is_public("community_field")
     @community.custom_values = {"community_field" => {"value" => "new_value!", "public"=>"true"}, "profile_field"=> "another_value!"}
     @community.save
+    @community.reload
 
     assert @community.is_public("community_field")
     refute @community.is_public("profile_field")
