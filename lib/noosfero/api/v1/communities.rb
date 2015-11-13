@@ -20,7 +20,7 @@ module Noosfero
             communities = select_filtered_collection_of(environment, 'communities', params)
             communities = communities.visible_for_person(current_person)
             communities = communities.by_location(params) # Must be the last. May return Exception obj.
-            present communities, :with => Entities::Community
+            present communities, :with => Entities::Community, :current_person => current_person
           end
 
 
@@ -45,12 +45,12 @@ module Noosfero
               render_api_errors!(community.errors.full_messages)
             end
 
-            present community, :with => Entities::Community
+            present community, :with => Entities::Community, :current_person => current_person
           end
 
           get ':id' do
             community = environment.communities.visible_for_person(current_person).find_by_id(params[:id])
-            present community, :with => Entities::Community
+            present community, :with => Entities::Community, :current_person => current_person
           end
 
         end
@@ -65,7 +65,7 @@ module Noosfero
                 person = environment.people.find(params[:person_id])
                 communities = select_filtered_collection_of(person, 'communities', params)
                 communities = communities.visible
-                present communities, :with => Entities::Community
+                present communities, :with => Entities::Community, :current_person => current_person
               end
 
             end

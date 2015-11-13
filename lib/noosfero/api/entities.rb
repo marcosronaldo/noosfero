@@ -15,7 +15,7 @@ module Noosfero
       }
 
       def self.can_display? profile, options, field, permission = :friend
-        return true if profile.public_fields.include?(field)
+        return true if profile.public_fields.map{|f| f.to_sym}.include?(field.to_sym)
         current_person = options[:current_person]
 
         current_permission = if current_person.present?
@@ -31,7 +31,6 @@ module Noosfero
         else
           :anonymous
         end
-
         PERMISSIONS[current_permission] <= PERMISSIONS[permission]
       end
 
@@ -88,6 +87,13 @@ module Noosfero
           hash ={}
           profile.public_values.each do |value|
             hash[value.custom_field.name]=value.value
+          end
+
+          private_values = profile.custom_field_values - profile.public_values
+          private_values.each do |value|
+            if Entities.can_display?(profile,options,:custom_field)
+              hash[value.custom_field.name]=value.value
+            end
           end
           hash
         end

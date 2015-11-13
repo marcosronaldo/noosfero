@@ -33,26 +33,26 @@ module Noosfero
           get do
             people = select_filtered_collection_of(environment, 'people', params)
             people = people.visible_for_person(current_person)
-            present people, :with => Entities::Person
+            present people, :with => Entities::Person, :current_person => current_person
           end
 
           desc "Return the logged user information"
           get "/me" do
-            present current_person, :with => Entities::Person
+            present current_person, :with => Entities::Person, :current_person => current_person
           end
 
           desc "Return the person information"
           get ':id' do
             person = environment.people.visible_for_person(current_person).find_by_id(params[:id])
             return not_found! if person.blank?
-            present person, :with => Entities::Person
+            present person, :with => Entities::Person, :current_person => current_person
           end
 
           desc "Update person information"
           post ':id' do
             return forbidden! if current_person.id.to_s != params[:id]
             current_person.update_attributes!(params[:person])
-            present current_person, :with => Entities::Person
+            present current_person, :with => Entities::Person, :current_person => current_person
           end
 
           # Example Request:
@@ -79,7 +79,7 @@ module Noosfero
               render_api_errors!(user.errors.full_messages)
             end
 
-            present user.person, :with => Entities::Person
+            present user.person, :with => Entities::Person, :current_person => user.person
           end
 
           desc "Return the person friends"
@@ -87,7 +87,7 @@ module Noosfero
             person = environment.people.visible_for_person(current_person).find_by_id(params[:id])
             return not_found! if person.blank?
             friends = person.friends.visible
-            present friends, :with => Entities::Person
+            present friends, :with => Entities::Person, :current_person => current_person
           end
 
           desc "Return the person permissions on other profiles"
