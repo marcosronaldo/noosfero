@@ -47,6 +47,21 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal some_person.id, json['person']['id']
   end
 
+  should 'people endpoint filter by fields parameter' do
+    get "/api/v1/people?#{params.to_query}&fields=name"
+    json = JSON.parse(last_response.body)
+    expected = {'people' => [{'name' => person.name}]}
+    assert_equal expected, json
+  end
+
+  should 'people endpoint filter by fields parameter with hierarchy' do
+    fields = {only: [:name, {user: [:login]}]}.to_json
+    get "/api/v1/people?#{params.to_query}&fields=#{fields}"
+    json = JSON.parse(last_response.body)
+    expected = {'people' => [{'name' => person.name, 'user' => {'login' => 'testapi'}}]}
+    assert_equal expected, json
+  end
+
   should 'get logged person' do
     get "/api/v1/people/me?#{params.to_query}"
     json = JSON.parse(last_response.body)
@@ -205,4 +220,15 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal "www.blog.org", json['person']['additional_data']['Custom Blog']
   end
 
+  define_method "test_should_not_expose_#{attribute}_attribute_in_person_enpoint_if_field_parameter_does_not_contain_the_attribute" do
+    get "/api/v1/people/me?#{params.to_query}&fields=name"
+    json = JSON.parse(last_response.body)
+    assert_nil json['person'][attribute]
+  end
+
+  define_method "test_should_expose_#{attribute}_attribute_in_person_enpoints_if_field_parameter_is_passed" do
+    get "/api/v1/people/me?#{params.to_query}&fields=#{attribute}"
+    json = JSON.parse(last_response.body)
+    assert_not_nil json['person'][attribute]
+  end
 end
