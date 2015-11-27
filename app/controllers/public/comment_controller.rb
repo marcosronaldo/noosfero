@@ -38,6 +38,7 @@ class CommentController < ApplicationController
     @comment.referrer = request.referrer
     @plugins.dispatch(:filter_comment, @comment)
 
+
     if @comment.rejected?
       respond_to do |format|
         format.js do
