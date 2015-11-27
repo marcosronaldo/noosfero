@@ -155,6 +155,20 @@ class ProfileController < PublicController
     end
   end
 
+  def follow_article
+    article = Article.find params[:id]
+    article.person_followers << user
+    article.save
+    redirect_to article.url
+  end
+
+  def unfollow_article
+    article = Article.find params[:id]
+    article.person_followers.delete(user)
+    article.save
+    redirect_to article.url
+  end
+
   def unblock
     if current_user.person.is_admin?(profile.environment)
       profile.unblock

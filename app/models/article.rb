@@ -9,7 +9,7 @@ class Article < ActiveRecord::Base
                   :highlighted, :notify_comments, :display_hits, :slug,
                   :external_feed_builder, :display_versions, :external_link,
                   :image_builder, :show_to_followers,
-                  :author, :display_preview
+                  :author, :display_preview, :person_followers
 
   acts_as_having_image
 
@@ -78,7 +78,8 @@ class Article < ActiveRecord::Base
   belongs_to :created_by, :class_name => 'Person', :foreign_key => 'created_by_id'
 
   has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc'
-
+  has_many :article_followers, :dependent => :destroy
+  has_many :person_followers, :class_name => 'Person', :through => :article_followers, :source => :person
   has_many :article_categorizations, -> { where 'articles_categories.virtual = ?', false }
   has_many :categories, :through => :article_categorizations
 
@@ -91,7 +92,6 @@ class Article < ActiveRecord::Base
   settings_items :author_name, :type => :string, :default => ""
   settings_items :allow_members_to_edit, :type => :boolean, :default => false
   settings_items :moderate_comments, :type => :boolean, :default => false
-  settings_items :followers, :type => Array, :default => []
   has_and_belongs_to_many :article_privacy_exceptions, :class_name => 'Person', :join_table => 'article_privacy_exceptions'
 
   belongs_to :reference_article, :class_name => "Article", :foreign_key => 'reference_article_id'
@@ -167,6 +167,9 @@ class Article < ActiveRecord::Base
     end
   end
 
+  def followers_count
+    person_followers.size
+  end
 
   def is_trackable?
     self.published? && self.notifiable? && self.advertise? && self.profile.public_profile
@@ -405,6 +408,10 @@ class Article < ActiveRecord::Base
     (self.uploaded_file? and not self.image?) or
       (self.image? and view.blank?) or
       (not self.uploaded_file? and self.mime_type != 'text/html')
+  end
+
+  def is_person_following?(user)
+    self.person_followers.include? user
   end
 
   def download_headers

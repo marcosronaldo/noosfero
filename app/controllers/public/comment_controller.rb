@@ -36,7 +36,11 @@ class CommentController < ApplicationController
     @comment.ip_address = request.remote_ip
     @comment.user_agent = request.user_agent
     @comment.referrer = request.referrer
+    options = params.has_key?(:options) ? params[:options] : {}
+    follow_article = options[:follow_article] if options.has_key?(:follow_article)
+    @comment.follow_article = follow_article == 'true'
     @plugins.dispatch(:filter_comment, @comment)
+
 
     if @comment.rejected?
       respond_to do |format|

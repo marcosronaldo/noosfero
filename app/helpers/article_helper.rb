@@ -155,4 +155,20 @@ module ArticleHelper
     _('Edit')
   end
 
+  def follow_button_text(article)
+    if article.event?
+      _('Attend')
+    else
+      _('Follow')
+    end
+  end
+
+  def unfollow_button_text(article)
+    if article.event?
+      _('Unattend')
+    else
+      _('Unfollow')
+    end
+  end
+
 end

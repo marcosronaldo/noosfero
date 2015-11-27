@@ -387,7 +387,7 @@ class CommentControllerTest < ActionController::TestCase
     Article.record_timestamps = true
 
     login_as @profile.identifier
-    xhr :post, :create, :profile => profile.identifier, :id => page.id, :comment => { :title => 'crap!', :body => 'I think that this article is crap' }, :confirm => 'true'
+    xhr :post, :create, :profile => profile.identifier, :id => page.id, :comment => {:title => 'crap!', :body => 'I think that this article is crap' }, :confirm => 'true', :options => {:follow_article => 'true'}
     assert_not_equal yesterday, page.reload.updated_at
   end
 

@@ -13,6 +13,7 @@ class Comment < ActiveRecord::Base
   belongs_to :source, :counter_cache => true, :polymorphic => true
   alias :article :source
   alias :article= :source=
+  attr_accessor :follow_article
 
   belongs_to :author, :class_name => 'Person', :foreign_key => 'author_id'
   has_many :children, :class_name => 'Comment', :foreign_key => 'reply_of_id', :dependent => :destroy
@@ -100,10 +101,10 @@ class Comment < ActiveRecord::Base
 
   after_create :new_follower
   def new_follower
-    if source.kind_of?(Article)
-      article.followers += [author_email]
-      article.followers -= article.profile.notification_emails
-      article.followers.uniq!
+    if source.kind_of?(Article) and !author.nil? and @follow_article and !author.is_admin?
+      article.person_followers = [author]
+      article.person_followers -= article.profile.notification_emails
+      article.person_followers.uniq!
       article.save
     end
   end
@@ -145,7 +146,7 @@ class Comment < ActiveRecord::Base
       if !notification_emails.empty?
         CommentNotifier.notification(self).deliver
       end
-      emails = article.followers - [author_email]
+      emails = article.person_followers.collect{|p| p.email} - [author_email]
       if !emails.empty?
         CommentNotifier.mail_to_followers(self, emails).deliver
       end

@@ -49,7 +49,12 @@ class PersonNotifierTest < ActiveSupport::TestCase
   should 'display author name in delivered mail' do
     @community.add_member(@member)
     User.current = @admin.user
-    Comment.create!(:author => @admin, :title => 'test comment', :body => 'body!', :source => @article)
+    comment = Comment.new(:author => @admin, :title => 'test comment', :body => 'body!', :source => @article)
+    follower = fast_create(Person)
+    @article.person_followers += [follower]
+    @article.save!
+    @article.reload
+    comment.save!
     process_delayed_job_queue
     notify
     sent = ActionMailer::Base.deliveries.last
