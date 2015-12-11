@@ -1351,6 +1351,24 @@ class ProfileControllerTest < ActionController::TestCase
     assert_equivalent [scrap,activity], assigns(:activities).map(&:activity)
   end
 
+  should "follow an article" do
+    article = TinyMceArticle.create!(:profile => profile, :name => 'An article about free software')
+    login_as(@profile.identifier)
+    post :follow_article, :profile => profile.identifier, :id => article.id
+    assert_includes article.person_followers, @profile
+  end
+
+  should "unfollow an article" do
+    article = TinyMceArticle.create!(:profile => profile, :name => 'An article about free software')
+    article.person_followers << @profile
+    article.save!
+    assert_includes article.person_followers, @profile
+
+    login_as(@profile.identifier)
+    post :unfollow_article, :profile => profile.identifier, :id => article.id
+    assert_not_includes article.person_followers, @profile
+  end
+
   should "be logged in to leave comment on an activity" do
     article = TinyMceArticle.create!(:profile => profile, :name => 'An article about free software')
     activity = ActionTracker::Record.last
