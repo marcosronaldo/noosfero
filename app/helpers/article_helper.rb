@@ -171,4 +171,14 @@ module ArticleHelper
     end
   end
 
+  def following_button(page, user)
+    if !user.blank? and user != page.author
+      if page.is_followed_by? user
+        button :cancel, unfollow_button_text(page), {:controller => 'profile', :action => 'unfollow_article', :article_id => page.id}
+      else
+        button :add, follow_button_text(page), {:controller => 'profile', :action => 'follow_article', :article_id => page.id}
+      end
+    end
+  end
+
 end

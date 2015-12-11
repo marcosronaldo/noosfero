@@ -27,7 +27,7 @@ class ProfileControllerTest < ActionController::TestCase
     login_as('follower')
     article.reload
     assert_includes Article.find(article.id).person_followers, follower
-    post :unfollow_article, :id => article.id
+    post :unfollow_article, :article_id => article.id
     assert_not_includes Article.find(article.id).person_followers, follower
   end
 
@@ -1354,7 +1354,7 @@ class ProfileControllerTest < ActionController::TestCase
   should "follow an article" do
     article = TinyMceArticle.create!(:profile => profile, :name => 'An article about free software')
     login_as(@profile.identifier)
-    post :follow_article, :profile => profile.identifier, :id => article.id
+    post :follow_article, :profile => profile.identifier, :article_id => article.id
     assert_includes article.person_followers, @profile
   end
 
@@ -1365,7 +1365,7 @@ class ProfileControllerTest < ActionController::TestCase
     assert_includes article.person_followers, @profile
 
     login_as(@profile.identifier)
-    post :unfollow_article, :profile => profile.identifier, :id => article.id
+    post :unfollow_article, :profile => profile.identifier, :article_id => article.id
     assert_not_includes article.person_followers, @profile
   end
 

@@ -55,13 +55,7 @@
       <%= button plugin_button[:icon], plugin_button[:title], plugin_button[:url], plugin_button[:html_options] %>
     <% end %>
 
-    <% if !user.blank? and user != @page.author %>
-      <% if @page.is_followed_by? user %>
-        <%= button :cancel, unfollow_button_text(@page), {:controller => 'profile', :action => 'unfollow_article', :id => @page.id} %>
-      <% else %>
-        <%= button :add, follow_button_text(@page), {:controller => 'profile', :action => 'follow_article', :id => @page.id} %>
-      <% end %>
-    <% end %>
+    <%= following_button @page, user %>
 
     <%= report_abuse(profile, :link, @page) %>
 

@@ -156,13 +156,13 @@ class ProfileController < PublicController
   end
 
   def follow_article
-    article = profile.environment.articles.find params[:id]
+    article = profile.environment.articles.find params[:article_id]
     article.person_followers << user
     redirect_to article.url
   end
 
   def unfollow_article
-    article = profile.environment.articles.find params[:id]
+    article = profile.environment.articles.find params[:article_id]
     article.person_followers.delete(user)
     redirect_to article.url
   end

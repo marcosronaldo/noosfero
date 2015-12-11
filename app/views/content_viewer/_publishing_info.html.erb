@@ -14,14 +14,14 @@
 <span class="followers-count">
 |
 <% if @page.event? %>
-  <% if @page.followers_count > 0 %>
-    <%= _("%s will attend this event.") % [ pluralize(@page.followers_count, _("person"))]%>
+  <% if @page.person_followers.size > 0 %>
+    <%= _("%s will attend this event.") % [ pluralize(@page.person_followers.size, _("person"))]%>
   <% else %>
     <%= _("No one attending this event yet.") %>
   <% end %>
 <% else %>
-  <% if @page.followers_count > 0 %>
-    <%= _("%s following this article.") % [ pluralize(@page.followers_count, _("person"))]%>
+  <% if @page.person_followers.size > 0 %>
+    <%= _("%s following this article.") % [ pluralize(@page.person_followers.size, _("person"))]%>
   <% else %>
     <%= _("No one following this article yet.") %>
   <% end %>
