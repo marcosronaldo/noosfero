@@ -395,7 +395,7 @@ class CommentControllerTest < ActionController::TestCase
     page = create(Article, :profile => profile, :name => 'myarticle', :body => 'the body of the text')
     login_as @profile.identifier
 
-    xhr :post, :create, :profile => profile.identifier, :id => page.id, :comment => {:title => 'crap!', :body => 'I think that this article is crap' }, :confirm => 'true', :options => {:follow_article => 'true'}
+    xhr :post, :create, :profile => profile.identifier, :id => page.id, :comment => {:title => 'crap!', :body => 'I think that this article is crap', :follow_article => true}, :confirm => 'true'
     assert_includes page.person_followers, @profile
   end
 
@@ -403,7 +403,7 @@ class CommentControllerTest < ActionController::TestCase
     page = create(Article, :profile => profile, :name => 'myarticle', :body => 'the body of the text')
     login_as @profile.identifier
 
-    xhr :post, :create, :profile => profile.identifier, :id => page.id, :comment => {:title => 'crap!', :body => 'I think that this article is crap' }, :confirm => 'true', :options => {:follow_article => 'false'}
+    xhr :post, :create, :profile => profile.identifier, :id => page.id, :comment => {:title => 'crap!', :body => 'I think that this article is crap', :follow_article => false }, :confirm => 'true'
     assert_not_includes page.person_followers, @profile
   end
 

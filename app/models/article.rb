@@ -80,6 +80,7 @@ class Article < ActiveRecord::Base
   has_many :comments, :class_name => 'Comment', :foreign_key => 'source_id', :dependent => :destroy, :order => 'created_at asc'
   has_many :article_followers, :dependent => :destroy
   has_many :person_followers, :class_name => 'Person', :through => :article_followers, :source => :person
+  has_many :person_followers_emails, :class_name => 'User', :through => :person_followers, :source => :user, :select => :email
   has_many :article_categorizations, -> { where 'articles_categories.virtual = ?', false }
   has_many :categories, :through => :article_categorizations
 
@@ -365,6 +366,10 @@ class Article < ActiveRecord::Base
 
   def belongs_to_forum?
     self.parent and self.parent.forum?
+  end
+
+  def person_followers_email_list
+    person_followers_emails.map{|p|p.email}
   end
 
   def info_from_last_update

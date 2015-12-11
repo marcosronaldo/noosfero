@@ -145,7 +145,7 @@ class Comment < ActiveRecord::Base
       if !notification_emails.empty?
         CommentNotifier.notification(self).deliver
       end
-      emails = article.person_followers.collect{|p| p.email} - [author_email]
+      emails = article.person_followers_email_list - [author_email]
       if !emails.empty?
         CommentNotifier.mail_to_followers(self, emails).deliver
       end
