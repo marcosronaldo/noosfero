@@ -109,6 +109,13 @@ module Noosfero
       class Person < Profile
         root 'people', 'person'
         expose :user, :using => UserBasic, documentation: {type: 'User', desc: 'The user data of a person' }
+        expose :vote_count
+        expose :comments_count do |person, options|
+          person.comments.count
+        end
+        expose :articles_count do |person, options|
+          person.articles.count
+        end
       end
 
       class Enterprise < Profile
@@ -148,6 +155,8 @@ module Noosfero
         expose :children_count
         expose :slug, :documentation => {:type => "String", :desc => "Trimmed and parsed name of a article"}
         expose :path
+        expose :votes_count
+        expose :comments_count
       end
 
       class Article < ArticleBase
@@ -188,7 +197,7 @@ module Noosfero
 
       class UserLogin < User
         root 'users', 'user'
-        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}
+        expose :private_token, documentation: {type: 'String', desc: 'A valid authentication code for post/delete api actions'}, if: lambda {|object, options| object.activated? }
       end
 
       class Task < Entity
