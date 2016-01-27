@@ -68,6 +68,13 @@ class PeopleTest < ActiveSupport::TestCase
     assert_equal person.id, json['person']['id']
   end
 
+  should 'me endpoint filter by fields parameter' do
+    get "/api/v1/people/me?#{params.to_query}&fields=name"
+    json = JSON.parse(last_response.body)
+    expected = {'person' => {'name' => person.name}}
+    assert_equal expected, json
+  end
+
   should 'not get invisible person' do
     person = fast_create(Person, :visible => false)
 

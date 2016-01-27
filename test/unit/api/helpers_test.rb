@@ -25,6 +25,15 @@ class APIHelpersTest < ActiveSupport::TestCase
     assert_equal user, current_user
   end
 
+  should 'get the current user even with expired token' do
+    user = create_user('someuser')
+    user.generate_private_token!
+    user.private_token_generated_at = DateTime.now.prev_year
+    user.save
+    self.params = {:private_token => user.private_token}
+    assert_equal user, current_user
+  end
+
   should 'get the person of current user' do
     user = create_user('someuser')
     user.generate_private_token!
