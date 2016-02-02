@@ -108,6 +108,13 @@ class AccountControllerTest < ActionController::TestCase
     end
   end
 
+  def test_shoud_save_with_custom_field_on_signup
+    assert_difference 'User.count' do
+      CustomField.create!(:name => "zombies", :format=>"String", :default_value => "awrrr", :customized_type=>"Profile", :active => true, :required => true, :signup => true, :environment => Environment.default)
+      new_user({},{"profile_data"=> {"custom_values"=>{"myField"=>{"value"=>"BRAINSSS"}}}})
+    end
+  end
+
   def test_should_logout
     login_as :johndoe
     get :logout
