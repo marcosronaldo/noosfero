@@ -9,8 +9,8 @@ endpoints.map do |endpoint|
   unless app.blank?
     endpoint.routes.map do |route|
       {
-        method: route.route_method,
-        path: route.route_path.gsub(':version', route.route_version).split('(').first
+        method: route.request_method,
+        path: route.path.gsub(':version', route.version).split('(').first
       }
     end
   end
