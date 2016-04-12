@@ -361,7 +361,7 @@ class ArticlesTest < ActiveSupport::TestCase
     should "#{kind} create article with parent" do
       profile = fast_create(kind.camelcase.constantize, :environment_id => environment.id)
       Person.any_instance.stubs(:can_post_content?).with(profile).returns(true)
-      article = fast_create(Article)
+      article = fast_create(Article, :profile_id => profile.id)
 
       params[:article] = {:name => "Title", :parent_id => article.id}
       post "/api/v1/#{kind.pluralize}/#{profile.id}/articles?#{params.to_query}"
@@ -455,15 +455,6 @@ class ArticlesTest < ActiveSupport::TestCase
     params[:article] = {:name => "Title"}
     post "/api/v1/people/#{person.id}/articles?#{params.to_query}"
     assert_equal 403, last_response.status
-  end
-
-  should 'person create article with parent' do
-    article = fast_create(Article)
-
-    params[:article] = {:name => "Title", :parent_id => article.id}
-    post "/api/v1/people/#{user.person.id}/articles?#{params.to_query}"
-    json = JSON.parse(last_response.body)
-    assert_equal article.id, json["article"]["parent"]["id"]
   end
 
   should 'person create article with content type passed as parameter' do
@@ -664,4 +655,15 @@ class ArticlesTest < ActiveSupport::TestCase
       assert_not_nil json['article'][attribute]
     end
   end
+
+  should 'return an article url' do
+    person = create_user('test_user').person
+    article = create(Article, :name => 'Zombies', :body => 'BRAINSSSS', :profile_id => person.id)
+
+    get "/api/v1/articles/#{article.id}?#{params.to_query}"
+    json = JSON.parse(last_response.body)
+
+    assert_equal json['article']['url'], Rails.application.routes.url_helpers.url_for(article.url)
+  end
+
 end

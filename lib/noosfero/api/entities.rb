@@ -175,6 +175,9 @@ module Noosfero
         expose :votes_count
         expose :comments_count
         expose :type
+        expose :url do |article, options|
+          Rails.application.routes.url_helpers.url_for(article.url)
+        end
       end
 
       class Article < ArticleBase
