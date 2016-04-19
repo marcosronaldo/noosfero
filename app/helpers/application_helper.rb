@@ -56,6 +56,8 @@ module ApplicationHelper
 
   include TaskHelper
 
+  include MembershipsHelper
+
   def locale
     (@page && !@page.language.blank?) ? @page.language : FastGettext.locale
   end

@@ -5,3 +5,8 @@ roles.each do |role|
 end
 content_tag('p', content, :class => 'member-classify-suggestion')
 %>
+<% if task.organization.requires_email%>
+  <div>
+    <%= "Email: "+task.requestor.email %>
+  </div>
+<% end %>

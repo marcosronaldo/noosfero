@@ -1,16 +1,15 @@
-<h1><%= _('Joining %s') % profile.name %></h1>
+<h1><%= _('To join %s, you must authorize:') % profile.name %></h1>
 
 <p>
-<%= _('Are you sure you want to join %s?') % profile.name %>
+  <%= _('Visibility of your email address') % profile.name %><br>
+  <span><%= _('Only for the admin') %></span>
 </p>
 
-<%= form_tag do %>
+
+<%= form_tag url_for({:action => :join_modal, :controller => :profile}) do %>
   <%= hidden_field_tag('back_to', @back_to) %>
   <%= hidden_field_tag(:confirmation, 1) %>
+  <%= hidden_field_tag(:show_email, 1) %>
   <%= submit_button(:ok, _("Yes, I want to join.") % profile.name) %>
-  <% if logged_in? && request.xhr? %>
-    <%= modal_close_button _("No, I don't want") %>
-  <% else %>
-    <%= button(:cancel, _("No, I don't want."), profile.url) %>
-  <% end %>
+  <%= modal_close_button _("No, I don't want") %>
 <% end %>

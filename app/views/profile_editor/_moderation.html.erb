@@ -9,6 +9,10 @@
       <%= _('Send administrator Email for every task') %>
     </div>
   </div>
+    <%= check_box(:profile_data, :requires_email, :style => 'float: left') %>
+    <div style='margin-left: 30px'>
+      <%= _('Require email of new members') %>
+    </div>
 
   <div style='margin-bottom: 1em'>
     <h4><%= _('Invitation moderation:')%></h4>

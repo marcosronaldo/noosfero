@@ -34,6 +34,11 @@ jQuery(function($) {
     return false;
   })
 
+  $(".modal-close").live('click', function(){
+    $(".join-community").css("cursor","");
+    $(".small-loading").remove();
+  })
+
   $(".leave-community").live('click', function(){
     if (!confirm(noosfero.add_and_join.locales.leaveConfirmation))
       return false;
